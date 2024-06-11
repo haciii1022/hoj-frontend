@@ -54,8 +54,10 @@ const visibleRoutes = computed(() => {
       return false;
     }
     //根据权限校验
-    return checkAccess(store.state.user.loginUser, item?.meta?.access as string);
-
+    return checkAccess(
+      store.state.user.loginUser,
+      item?.meta?.access as string
+    );
   });
 });
 

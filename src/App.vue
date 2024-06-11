@@ -1,9 +1,13 @@
 <template>
   <div id="app">
-    <BasicLayout />
+    <template v-if="route.path.startsWith('/user')">
+      <router-view />
+    </template>
+    <template v-else>
+      <BasicLayout />
+    </template>
   </div>
 </template>
-
 <style>
 #app {
 }
@@ -11,28 +15,16 @@
 
 <script setup lang="ts">
 import BasicLayout from "@/layouts/BasicLayout.vue";
+import { onMounted } from "vue";
+import { useRoute } from "vue-router";
+
+const route = useRoute();
+
 const doInit = () => {
   console.log("init");
-}
+};
 
 onMounted(() => {
   doInit();
 });
-
-import { useRouter } from "vue-router";
-import store from "@/store";
-import ACCESS_ENUM from "@/access/accessEnum";
-import { onMounted } from "vue";
-
-// const router = useRouter();
-//
-// router.beforeEach((to, from, next) => {
-//   if (to.meta?.access === "canAdmin") {
-//     if (store.state.user.loginUser?.userRole !== ACCESS_ENUM.ADMIN) {
-//       next("/noAuth");
-//       return;
-//     }
-//   }
-//   next();
-// });
 </script>
