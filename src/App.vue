@@ -11,9 +11,18 @@
 
 <script setup lang="ts">
 import BasicLayout from "@/layouts/BasicLayout.vue";
+const doInit = () => {
+  console.log("init");
+}
+
+onMounted(() => {
+  doInit();
+});
+
 import { useRouter } from "vue-router";
 import store from "@/store";
 import ACCESS_ENUM from "@/access/accessEnum";
+import { onMounted } from "vue";
 
 // const router = useRouter();
 //
