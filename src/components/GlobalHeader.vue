@@ -1,5 +1,5 @@
 <template>
-  <a-row id="globalHeader" style="margin-bottom: 16px" align="center">
+  <a-row id="globalHeader" align="center">
     <a-col flex="auto">
       <a-menu
         mode="horizontal"
@@ -30,8 +30,10 @@
 <script lang="ts" setup>
 import { routes } from "@/router/routes";
 import { useRouter } from "vue-router";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { useStore } from "vuex";
+import checkAccess from "@/access/checkAccess";
+import ACCESS_ENUM from "@/access/accessEnum";
 
 const router = useRouter();
 const store = useStore();
@@ -45,17 +47,22 @@ const doMenuClick = (key: string) => {
   });
 };
 
-const visibleRoutes = routes.filter((item, index) => {
-  if (item.meta?.hideInMenu) {
-    return false;
-  }
-  return true;
+//用于展示的路由
+const visibleRoutes = computed(() => {
+  return routes.filter((item) => {
+    if (item.meta?.hideInMenu) {
+      return false;
+    }
+    //根据权限校验
+    return checkAccess(store.state.user.loginUser, item?.meta?.access as string);
+
+  });
 });
 
 setTimeout(() => {
   store.dispatch("user/getLoginUser", {
     userName: "haciii1022",
-    role: "admin",
+    userRole: ACCESS_ENUM.ADMIN,
   });
   console.log("store", store.state.user.loginUser.userName);
 }, 5000);
