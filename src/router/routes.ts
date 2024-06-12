@@ -9,9 +9,12 @@ import UserRegisterView from "@/views/user/UserRegisterView.vue";
 
 export const routes: Array<RouteRecordRaw> = [
   {
-    path: "/user",
+    path: "/user/login",
     name: "用户",
     component: UserLayout,
+    meta: {
+      hideInMenu: true,
+    },
     children: [
       {
         path: "/user/login",

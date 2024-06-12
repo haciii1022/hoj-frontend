@@ -12,7 +12,7 @@
           disabled
         >
           <div class="title-bar">
-            <img class="logo" src="../assets/oj-logo.jpg" />
+            <img alt="logo" class="logo" src="../assets/oj-logo.jpg" />
             <div class="title">HOJ</div>
           </div>
         </a-menu-item>
@@ -22,7 +22,67 @@
       </a-menu>
     </a-col>
     <a-col flex="100px">
-      {{ store.state.user?.loginUser?.userName ?? "未登录" }}
+      <a-dropdown trigger="hover">
+        <a-avatar shape="circle">
+          <template
+            v-if="loginUser 
+            && loginUser.userRole as string !== ACCESS_ENUM.NOT_LOGIN"
+          >
+            <template v-if="loginUser.userAvatar">
+              <img
+                alt="avatar"
+                :src="loginUser.userAvatar"
+                class="userAvatar"
+              />
+            </template>
+            <template v-else>
+              <img
+                alt="avatar"
+                src="../assets/default_avatar.svg"
+                class="userAvatar"
+              />
+            </template>
+          </template>
+          <template v-else>
+            <img
+              alt="avatar"
+              src="../assets/not_login.svg"
+              class="userAvatar"
+            />
+          </template>
+        </a-avatar>
+        <template #content>
+          <template
+            v-if="loginUser 
+            && loginUser.userRole as string !== ACCESS_ENUM.NOT_LOGIN"
+          >
+            <a-doption>
+              <template #icon>
+                <icon-user />
+              </template>
+              <template #default>个人信息</template>
+            </a-doption>
+            <a-doption>
+              <template #icon>
+                <icon-user />
+              </template>
+              <template #default>
+                <a-anchor-link @click="doLogout">退出登录</a-anchor-link>
+              </template>
+            </a-doption>
+          </template>
+          <template v-else>
+            <a-doption>
+              <template #icon>
+                <icon-user />
+              </template>
+              <template #default>
+                <a-anchor-link href="/user/login">登录</a-anchor-link>
+              </template>
+            </a-doption>
+          </template>
+        </template>
+      </a-dropdown>
     </a-col>
   </a-row>
 </template>
@@ -34,17 +94,25 @@ import { computed, ref } from "vue";
 import { useStore } from "vuex";
 import checkAccess from "@/access/checkAccess";
 import ACCESS_ENUM from "@/access/accessEnum";
+import { UserControllerService } from "../../generated";
 
 const router = useRouter();
 const store = useStore();
+const loginUser = store.state.user.loginUser;
 
-console.log("store", store.state.user.loginUser.userName);
+console.log("loginUser", JSON.stringify(loginUser));
 // 默认主页
 const selectedKeys = ref(["/"]);
+
 const doMenuClick = (key: string) => {
   router.push({
     path: key,
   });
+};
+
+const doLogout = () => {
+  UserControllerService.userLogoutUsingPost();
+  location.reload();
 };
 
 //用于展示的路由
@@ -61,13 +129,13 @@ const visibleRoutes = computed(() => {
   });
 });
 
-setTimeout(() => {
-  store.dispatch("user/getLoginUser", {
-    userName: "haciii1022",
-    userRole: ACCESS_ENUM.ADMIN,
-  });
-  console.log("store", store.state.user.loginUser.userName);
-}, 5000);
+// setTimeout(() => {
+//   store.dispatch("user/getLoginUser", {
+//     userName: "haciii1022",
+//     userRole: ACCESS_ENUM.ADMIN,
+//   });
+//   console.log("store", store.state.user.loginUser.userName);
+// }, 5000);
 
 // 路由跳转后，更新选中的菜单项
 router.afterEach((to, from, failure) => {

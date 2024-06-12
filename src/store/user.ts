@@ -7,8 +7,8 @@ export default {
   namespaced: true,
   state: () => ({
     loginUser: {
-      userName: "未登录",
-      userRole: null,
+      userName: "",
+      userRole: ACCESS_ENUM.NOT_LOGIN,
     },
   }),
   actions: {
