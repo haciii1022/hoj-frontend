@@ -1,6 +1,6 @@
 <template>
   <div class="about">
-    <CodeEditor :value="value2" :handle-change="onChange2" :value2="value" />
+    <CodeEditor :value="value2" :handle-change="onChange2" />
     <MdEditor :value="value" :handle-change="onChange" />
     <h1>This is an about page</h1>
   </div>
@@ -19,7 +19,7 @@ const onChange = (v: string) => {
 };
 const onChange2 = (v: string) => {
   console.log("flkajfklajkf" + v);
-  value.value = v;
+  value2.value = v;
 };
 </script>
 <style>

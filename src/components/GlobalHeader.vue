@@ -98,6 +98,8 @@ import { UserControllerService } from "../../generated";
 
 const router = useRouter();
 const store = useStore();
+//TODO 每次浏览器刷新，就会把store中的数据清除，后续要改成持久化存储
+store.dispatch("user/getLoginUser");
 const loginUser = store.state.user.loginUser;
 
 console.log("loginUser", JSON.stringify(loginUser));

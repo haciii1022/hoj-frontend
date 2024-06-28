@@ -2,7 +2,7 @@
 import { StoreOptions } from "vuex";
 import ACCESS_ENUM from "@/access/accessEnum";
 import { UserControllerService } from "../../generated";
-
+//TODO 每次浏览器刷新，就会把store中的数据清除，后续要改成持久化存储
 export default {
   namespaced: true,
   state: () => ({

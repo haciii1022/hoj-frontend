@@ -1,5 +1,10 @@
 <template>
-  <Editor :value="value" :plugins="plugins" @change="handleChange" />
+  <Editor
+    :value="value"
+    :mode="mode"
+    :plugins="plugins"
+    @change="handleChange"
+  />
 </template>
 
 <script setup lang="ts">
@@ -12,6 +17,7 @@ import { Editor, Viewer } from "@bytemd/vue-next";
  */
 interface Props {
   value: string;
+  mode: string;
   handleChange: (v: string) => void;
 }
 
@@ -28,10 +34,15 @@ const plugins = [
 // eslint-disable-next-line no-undef,@typescript-eslint/no-unused-vars
 const props = withDefaults(defineProps<Props>(), {
   value: "",
+  mode: "split",
   handleChange: (v: string) => {
     console.log(v);
   },
 });
 </script>
 
-<style scoped></style>
+<style>
+.bytemd-toolbar-icon.bytemd-tippy.bytemd-tippy-right:last-child {
+  display: none;
+}
+</style>

@@ -17,7 +17,8 @@
 import BasicLayout from "@/layouts/BasicLayout.vue";
 import { onMounted } from "vue";
 import { useRoute } from "vue-router";
-
+import { debounce } from "lodash";
+import store from "@/store";
 const route = useRoute();
 
 const doInit = () => {
@@ -27,4 +28,15 @@ const doInit = () => {
 onMounted(() => {
   doInit();
 });
+
+/**
+ * 防抖动
+ */
+const _ = (window as any).ResizeObserver;
+(window as any).ResizeObserver = class ResizeObserver extends _ {
+  constructor(callback: (...args: any[]) => void) {
+    callback = debounce(callback, 100);
+    super(callback);
+  }
+};
 </script>

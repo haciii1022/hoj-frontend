@@ -1,7 +1,5 @@
 <template>
   <div id="code-editor" ref="codeEditorRef" style="min-height: 400px" />
-  {{ value }}
-  <a-button @click="fillValue">填充值</a-button>
 </template>
 
 <script setup lang="ts">
@@ -29,14 +27,6 @@ const props = withDefaults(defineProps<Props>(), {
     console.log(v);
   },
 });
-
-const fillValue = () => {
-  if (!codeEditor.value) {
-    return;
-  }
-  // 改变值
-  toRaw(codeEditor.value).setValue("新的值");
-};
 
 onMounted(() => {
   if (!codeEditorRef.value) {

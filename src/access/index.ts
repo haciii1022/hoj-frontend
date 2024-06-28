@@ -4,7 +4,9 @@ import ACCESS_ENUM from "@/access/accessEnum";
 import checkAccess from "@/access/checkAccess";
 
 router.beforeEach(async (to, from, next) => {
-  console.log("登录用户信息", store.state.user.loginUser);
+  //TODO 每次浏览器刷新，就会把store中的数据清除，后续要改成持久化存储
+  await store.dispatch("user/getLoginUser");
+  console.log("登录用户信息", JSON.stringify(store.state.user.loginUser));
   const loginUser = store.state.user.loginUser;
 
   //如果之前没有登录过，自动登录

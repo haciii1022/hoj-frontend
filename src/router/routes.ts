@@ -6,6 +6,7 @@ import ACCESS_ENUM from "@/access/accessEnum";
 import UserLayout from "@/layouts/UserLayout.vue";
 import UserLoginView from "@/views/user/UserLoginView.vue";
 import UserRegisterView from "@/views/user/UserRegisterView.vue";
+import AddQuestionView from "@/views/question/AddQuestionView.vue";
 
 export const routes: Array<RouteRecordRaw> = [
   {
@@ -34,6 +35,14 @@ export const routes: Array<RouteRecordRaw> = [
     component: HomeView,
   },
   {
+    path: "/add/question",
+    name: "新增题目",
+    component: AddQuestionView,
+    meta: {
+      access: ACCESS_ENUM.ADMIN,
+    },
+  },
+  {
     path: "/noAuth",
     name: "无权限",
     component: NoAuthView,
@@ -46,7 +55,6 @@ export const routes: Array<RouteRecordRaw> = [
     name: "管理员可见",
     component: AdminView,
     meta: {
-      requireAuth: true,
       access: ACCESS_ENUM.ADMIN,
     },
   },
