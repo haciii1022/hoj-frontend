@@ -4,11 +4,16 @@
   <a-table
     :columns="columns"
     :data="dataList"
+    @page-change="doPageChange"
+    @page-size-change="doPageSizeChange"
     :pagination="{
       pageSize: searchParms.pageSize,
+      pageSizeOptions: [5, 10, 15, 20],
       current: searchParms.current,
       total: total,
       showTotal: true,
+      showPageSize: true,
+      showJumper: true,
     }"
   >
     <template #optional="{ record }">
@@ -22,7 +27,7 @@
   <button @click="loadData">11111</button>
 </template>
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watchEffect } from "vue";
 import {
   JudgeConfig,
   Question,
@@ -52,10 +57,12 @@ const loadData = async () => {
     Message.error("获取题目列表失败, " + res.message);
   }
 };
+
 interface DataRecord {
   key: string;
   judgeConfig: JudgeConfig;
 }
+
 const columns = [
   {
     title: "Id",
@@ -173,6 +180,24 @@ const doUpdate = async (question: Question) => {
     },
   });
 };
+const doPageChange = async (pageNumber: number) => {
+  searchParms.value = {
+    ...searchParms.value,
+    current: pageNumber,
+  };
+};
+const doPageSizeChange = async (pageSize: number) => {
+  searchParms.value = {
+    ...searchParms.value,
+    pageSize: pageSize,
+  };
+};
+/**
+ * 监听searchParms变量，改变时触发loadData()
+ */
+watchEffect(() => {
+  loadData();
+});
 </script>
 
 <style scoped>
