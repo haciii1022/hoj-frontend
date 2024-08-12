@@ -25,7 +25,7 @@
       <a-dropdown trigger="hover">
         <a-avatar shape="circle">
           <template
-            v-if="loginUser 
+            v-if="loginUser
             && loginUser.userRole as string !== ACCESS_ENUM.NOT_LOGIN"
           >
             <template v-if="loginUser.userAvatar">
@@ -53,7 +53,7 @@
         </a-avatar>
         <template #content>
           <template
-            v-if="loginUser 
+            v-if="loginUser
             && loginUser.userRole as string !== ACCESS_ENUM.NOT_LOGIN"
           >
             <a-doption>
@@ -90,7 +90,14 @@
 <script lang="ts" setup>
 import { routes } from "@/router/routes";
 import { useRouter } from "vue-router";
-import { computed, ref } from "vue";
+import {
+  computed,
+  onBeforeMount,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  watchEffect,
+} from "vue";
 import { useStore } from "vuex";
 import checkAccess from "@/access/checkAccess";
 import ACCESS_ENUM from "@/access/accessEnum";
@@ -99,10 +106,16 @@ import { UserControllerService } from "../../generated";
 const router = useRouter();
 const store = useStore();
 //TODO 每次浏览器刷新，就会把store中的数据清除，后续要改成持久化存储
-store.dispatch("user/getLoginUser");
-const loginUser = store.state.user.loginUser;
+let loginUser = ref(store.state.user.loginUser);
+console.log("User111 " + JSON.stringify(loginUser));
+//TODO 此处右上角图标还是会过一会才加载，后续看看是否需要用到localStorage
+onBeforeMount(async () => {
+  // 确保在导航前获取用户信息
+  await store.dispatch("user/getLoginUser");
+  loginUser = store.state.user.loginUser;
+  console.log("User " + JSON.stringify(loginUser));
+});
 
-console.log("loginUser", JSON.stringify(loginUser));
 // 默认主页
 const selectedKeys = ref(["/"]);
 
@@ -130,14 +143,6 @@ const visibleRoutes = computed(() => {
     );
   });
 });
-
-// setTimeout(() => {
-//   store.dispatch("user/getLoginUser", {
-//     userName: "haciii1022",
-//     userRole: ACCESS_ENUM.ADMIN,
-//   });
-//   console.log("store", store.state.user.loginUser.userName);
-// }, 5000);
 
 // 路由跳转后，更新选中的菜单项
 router.afterEach((to, from, failure) => {

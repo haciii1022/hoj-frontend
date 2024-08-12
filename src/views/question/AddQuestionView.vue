@@ -2,10 +2,10 @@
   <div id="addQuestionView">
     <h2>新增题目</h2>
     <a-form :model="form" label-align="left">
-      <a-form-item field="data.answer" tooltip="请输入答案" label="答案">
+      <a-form-item field="answer" tooltip="请输入答案" label="答案">
         <MdEditor :value="form.answer" :handle-change="onAnswerChange" />
       </a-form-item>
-      <a-form-item field="data.content" tooltip="请输入内容" label="内容">
+      <a-form-item field="content" tooltip="请输入内容" label="内容">
         <MdEditor :value="form.content" :handle-change="onContentChange" />
       </a-form-item>
       <a-form-item field="data.tags" tooltip="请输入标签" label="标签">
@@ -98,18 +98,14 @@
   </div>
 </template>
 <script setup lang="ts">
-import { onMounted, reactive, ref } from "vue";
+import { onMounted, ref } from "vue";
 import MdEditor from "@/components/MdEditor.vue";
-import {
-  QuestionAddRequest,
-  QuestionControllerService,
-} from "../../../generated";
+import { QuestionControllerService } from "../../../generated";
 import { Message } from "@arco-design/web-vue";
-import store from "@/store";
 import { useRoute, useRouter } from "vue-router";
 
 let form = ref({
-  answer: "",
+  answer: "$a \\times b$",
   content: "",
   tags: [],
   title: "",
@@ -133,8 +129,7 @@ const updatePage = route.path.includes("update");
 const lodaData = async () => {
   let id = route.query.id;
   if (!id) {
-    id = "1807693016979218433";
-    // return;
+    return;
   }
   const res = await QuestionControllerService.getQuestionByIdUsingGet(
     id as any
@@ -205,7 +200,7 @@ const doSubmit = async () => {
           path: "/question/add",
           replace: true,
         });
-      }, 1000); // 延迟2秒
+      }, 1000); // 延迟1秒
     } else {
       Message.error("更新失败, " + res.message);
     }
@@ -221,7 +216,7 @@ const doSubmit = async () => {
           path: "/question/add",
           replace: true,
         });
-      }, 1000); // 延迟2秒
+      }, 1000); // 延迟1秒
     } else {
       Message.error("创建失败, " + res.message);
     }

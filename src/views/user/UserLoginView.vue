@@ -37,8 +37,8 @@ import { useRouter } from "vue-router";
 import store from "@/store";
 
 const form = reactive({
-  userAccount: "",
-  userPassword: "",
+  userAccount: "Mirror",
+  userPassword: "12345678",
 } as UserLoginRequest);
 
 const router = useRouter();

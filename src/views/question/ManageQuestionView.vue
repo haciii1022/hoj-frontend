@@ -1,30 +1,30 @@
 <template>
-  <div id="addQuestionView"></div>
-  <h2>管理题目</h2>
-  <a-table
-    :columns="columns"
-    :data="dataList"
-    @page-change="doPageChange"
-    @page-size-change="doPageSizeChange"
-    :pagination="{
-      pageSize: searchParms.pageSize,
-      pageSizeOptions: [5, 10, 15, 20],
-      current: searchParms.current,
-      total: total,
-      showTotal: true,
-      showPageSize: true,
-      showJumper: true,
-    }"
-  >
-    <template #optional="{ record }">
-      <a-space>
-        <a-button type="primary" @click="doUpdate(record)">修改</a-button>
+  <div id="addQuestionView">
+    <h2>管理题目</h2>
+    <a-table
+      :columns="columns"
+      :data="dataList"
+      @page-change="doPageChange"
+      @page-size-change="doPageSizeChange"
+      :pagination="{
+        pageSize: searchParms.pageSize,
+        pageSizeOptions: [5, 10, 15, 20],
+        current: searchParms.current,
+        total: total,
+        showTotal: true,
+        showPageSize: true,
+        showJumper: true,
+      }"
+    >
+      <template #optional="{ record }">
+        <a-space>
+          <a-button type="primary" @click="doUpdate(record)">修改</a-button>
 
-        <a-button status="danger" @click="doDelete(record)">删除</a-button>
-      </a-space>
-    </template>
-  </a-table>
-  <button @click="loadData">11111</button>
+          <a-button status="danger" @click="doDelete(record)">删除</a-button>
+        </a-space>
+      </template>
+    </a-table>
+  </div>
 </template>
 <script setup lang="ts">
 import { onMounted, ref, watchEffect } from "vue";
@@ -57,11 +57,6 @@ const loadData = async () => {
     Message.error("获取题目列表失败, " + res.message);
   }
 };
-
-interface DataRecord {
-  key: string;
-  judgeConfig: JudgeConfig;
-}
 
 const columns = [
   {

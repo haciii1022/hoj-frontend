@@ -8,6 +8,8 @@ import UserLoginView from "@/views/user/UserLoginView.vue";
 import UserRegisterView from "@/views/user/UserRegisterView.vue";
 import AddQuestionView from "@/views/question/AddQuestionView.vue";
 import ManageQuestionView from "@/views/question/ManageQuestionView.vue";
+import QuestionListView from "@/views/question/QuestionListView.vue";
+import ScanQuestionView from "@/views/question/ScanQuestionView.vue";
 
 export const routes: Array<RouteRecordRaw> = [
   {
@@ -36,6 +38,21 @@ export const routes: Array<RouteRecordRaw> = [
     component: HomeView,
   },
   {
+    path: "/question/list",
+    name: "题目列表",
+    component: QuestionListView,
+  },
+  {
+    path: "/question/list/:id",
+    name: "在线做题",
+    props: true,
+    component: ScanQuestionView,
+    meta: {
+      access: ACCESS_ENUM.USER,
+      hideInMenu: true,
+    },
+  },
+  {
     path: "/question/add",
     name: "新增题目",
     component: AddQuestionView,
@@ -49,6 +66,7 @@ export const routes: Array<RouteRecordRaw> = [
     component: AddQuestionView,
     meta: {
       access: ACCESS_ENUM.ADMIN,
+      hideInMenu: true,
     },
   },
   {
