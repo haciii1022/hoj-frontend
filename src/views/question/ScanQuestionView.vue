@@ -11,10 +11,10 @@
                   :column="{ xs: 1, md: 2, lg: 3 }"
                 >
                   <a-descriptions-item label="时间限制">
-                    {{ question.judgeConfig?.timeLimit ?? 0 }}
+                    {{ question.judgeConfig?.timeLimit ?? 0 }} MS
                   </a-descriptions-item>
                   <a-descriptions-item label="空间限制">
-                    {{ question.judgeConfig?.memoryLimit ?? 0 }}
+                    {{ question.judgeConfig?.memoryLimit ?? 0 }} KB
                   </a-descriptions-item>
                   <a-descriptions-item label="堆栈限制">
                     {{ question.judgeConfig?.stackLimit ?? 0 }}
@@ -73,7 +73,6 @@ import { ref, withDefaults, defineProps, onMounted } from "vue";
 import {
   QuestionControllerService,
   QuestionSubmitAddRequest,
-  QuestionSubmitControllerService,
   QuestionVO,
 } from "../../../generated";
 import { Message } from "@arco-design/web-vue";
@@ -111,7 +110,7 @@ const changeCode = (v: string) => {
  * 提交代码
  */
 const doSubmit = async () => {
-  const res = await QuestionSubmitControllerService.doQuestionSubmitUsingPost(
+  const res = await QuestionControllerService.doQuestionSubmitUsingPost(
     form.value
   );
   if (res.code === 0) {

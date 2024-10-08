@@ -9,6 +9,12 @@ import gfm from "@bytemd/plugin-gfm";
 import highlight from "@bytemd/plugin-highlight";
 import math from "@bytemd/plugin-math";
 import { Viewer } from "@bytemd/vue-next";
+import "katex/dist/katex.css";
+import "juejin-markdown-themes/dist/juejin.min.css";
+import "bytemd/dist/index.css";
+// import "highlight.js/styles/vs.css";
+// import "@bytemd/plugin-math/locales/zh_Hans.json";
+import "bytemd/locales/zh_Hans.json";
 
 /**
  * 定义组件属性类型

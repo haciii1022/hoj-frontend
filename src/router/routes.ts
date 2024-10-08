@@ -10,6 +10,7 @@ import AddQuestionView from "@/views/question/AddQuestionView.vue";
 import ManageQuestionView from "@/views/question/ManageQuestionView.vue";
 import QuestionListView from "@/views/question/QuestionListView.vue";
 import ScanQuestionView from "@/views/question/ScanQuestionView.vue";
+import QuestionSubmitView from "@/views/question/QuestionSubmitListView.vue";
 
 export const routes: Array<RouteRecordRaw> = [
   {
@@ -76,6 +77,11 @@ export const routes: Array<RouteRecordRaw> = [
     meta: {
       access: ACCESS_ENUM.ADMIN,
     },
+  },
+  {
+    path: "/question_submit/list",
+    name: "提交记录",
+    component: QuestionSubmitView,
   },
   {
     path: "/noAuth",

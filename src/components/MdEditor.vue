@@ -3,21 +3,25 @@
     :value="value"
     :mode="mode"
     :plugins="plugins"
+    :locale="zhHans"
     @change="handleChange"
   />
 </template>
 
 <script setup lang="ts">
 import { withDefaults, defineProps } from "vue";
-// import "bytemd/dist/index.css";
-import "juejin-markdown-themes/dist/juejin.min.css";
 import gfm from "@bytemd/plugin-gfm";
 import highlight from "@bytemd/plugin-highlight";
-import "highlight.js/styles/vs.css";
 import math from "@bytemd/plugin-math";
-// import zhHans from "bytemd/locales/zh_Hans.json"; // 汉化
 import { Editor, Viewer } from "@bytemd/vue-next";
-
+import zhHans from "bytemd/locales/zh_Hans.json";
+import zhHan from "@bytemd/plugin-math/locales/zh_Hans.json"; // 汉化
+import "katex/dist/katex.css";
+import "highlight.js/styles/atom-one-dark.min.css";
+import "bytemd/dist/index.css";
+// import "highlight.js/styles/vs.css";
+// import "@bytemd/plugin-math/locales/zh_Hans.json";
+// import "bytemd/locales/zh_Hans.json";
 /**
  * 定义组件属性类型
  */
