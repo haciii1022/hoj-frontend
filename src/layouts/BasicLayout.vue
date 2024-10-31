@@ -1,15 +1,15 @@
 <template>
   <div id="basicLayout">
-    <a-layout style="min-height: 100vh">
+    <a-layout>
       <a-layout-header class="header">
         <GlobalHeader />
       </a-layout-header>
       <a-layout-content class="content">
         <router-view />
       </a-layout-content>
-      <a-layout-footer class="footer">
-        <a href="https://haciii1022.github.io/">知识星球 By Mirror</a>
-      </a-layout-footer>
+      <!--      <a-layout-footer class="footer">-->
+      <!--        <a href="https://haciii1022.github.io/">知识星球 By Mirror</a>-->
+      <!--      </a-layout-footer>-->
     </a-layout>
   </div>
 </template>
@@ -28,8 +28,9 @@ import GlobalHeader from "@/components/GlobalHeader.vue";
 
 #basicLayout .content {
   background: linear-gradient(to right, #efefef, #fff);
-  padding: 20px;
-  margin-bottom: 16px;
+  height: 90vh;
+  padding: 10px;
+  margin-bottom: 8px;
 }
 
 #basicLayout .footer {

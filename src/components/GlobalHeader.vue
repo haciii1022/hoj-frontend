@@ -90,14 +90,7 @@
 <script lang="ts" setup>
 import { routes } from "@/router/routes";
 import { useRouter } from "vue-router";
-import {
-  computed,
-  onBeforeMount,
-  onBeforeUnmount,
-  onMounted,
-  ref,
-  watchEffect,
-} from "vue";
+import { computed, ref } from "vue";
 import { useStore } from "vuex";
 import checkAccess from "@/access/checkAccess";
 import ACCESS_ENUM from "@/access/accessEnum";
@@ -105,17 +98,10 @@ import { UserControllerService } from "../../generated";
 
 const router = useRouter();
 const store = useStore();
-//TODO 每次浏览器刷新，就会把store中的数据清除，后续要改成持久化存储
-let loginUser = ref(store.state.user.loginUser);
+//FIXME 每次浏览器刷新，就会把store中的数据清除，后续要改成持久化存储
+let loginUser = JSON.parse(localStorage.getItem("loginUser") as string);
+// let loginUser = ref(store.state.user.loginUser);
 console.log("User111 " + JSON.stringify(loginUser));
-//TODO 此处右上角图标还是会过一会才加载，后续看看是否需要用到localStorage
-onBeforeMount(async () => {
-  // 确保在导航前获取用户信息
-  await store.dispatch("user/getLoginUser");
-  loginUser = store.state.user.loginUser;
-  console.log("User " + JSON.stringify(loginUser));
-});
-
 // 默认主页
 const selectedKeys = ref(["/"]);
 
@@ -152,6 +138,7 @@ router.afterEach((to, from, failure) => {
 
 <style scoped>
 #globalHeader {
+  height: 10vh;
 }
 
 .title-bar {
