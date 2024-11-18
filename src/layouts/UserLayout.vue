@@ -10,9 +10,9 @@
       <a-layout-content class="content">
         <router-view />
       </a-layout-content>
-      <a-layout-footer class="footer">
-        <a href="https://haciii1022.github.io/">知识星球 By Mirror</a>
-      </a-layout-footer>
+      <!--      <a-layout-footer class="footer">-->
+      <!--        <a href="https://haciii1022.github.io/">知识星球 By Mirror</a>-->
+      <!--      </a-layout-footer>-->
     </a-layout>
   </div>
 </template>

@@ -2575,6 +2575,31 @@ bytemd@1.21.0:
     vfile "^5.3.7"
     word-count "^0.2.2"
 
+bytemd@^1.21.0:
+  version "1.21.0"
+  resolved "https://registry.npmmirror.com/bytemd/-/bytemd-1.21.0.tgz#d330467e1bf280a2b7974b6bdeeeeec635879d2e"
+  integrity sha512-6nc658omwzcLdc/lT24w8G2x5pptZXiMyrQPbFuHwhYbmrLnsmKLm+9klsOx2/Lg2cYHYb2WzVh7zKZ9MZCVdg==
+  dependencies:
+    "@popperjs/core" "^2.11.7"
+    "@types/codemirror" "^5.60.7"
+    "@types/hast" "^2.3.4"
+    "@types/lodash-es" "^4.17.7"
+    "@types/mdast" "^3.0.11"
+    codemirror-ssr "^0.65.0"
+    hast-util-sanitize "^4.1.0"
+    lodash-es "^4.17.21"
+    rehype-raw "^6.1.1"
+    rehype-sanitize "^5.0.1"
+    rehype-stringify "^9.0.3"
+    remark-parse "^10.0.1"
+    remark-rehype "^10.1.0"
+    select-files "^1.0.1"
+    tippy.js "^6.3.7"
+    unified "^10.1.2"
+    unist-util-visit "^4.1.2"
+    vfile "^5.3.7"
+    word-count "^0.2.2"
+
 bytes@3.0.0:
   version "3.0.0"
   resolved "https://registry.npmmirror.com/bytes/-/bytes-3.0.0.tgz"
