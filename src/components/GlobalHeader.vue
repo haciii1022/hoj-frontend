@@ -60,7 +60,9 @@
               <template #icon>
                 <icon-user />
               </template>
-              <template #default>个人信息</template>
+              <template #default>
+                <a-anchor-link href="/user/info">个人信息</a-anchor-link>
+              </template>
             </a-doption>
             <a-doption>
               <template #icon>
@@ -113,6 +115,7 @@ const doMenuClick = (key: string) => {
 
 const doLogout = () => {
   UserControllerService.userLogoutUsingPost();
+  localStorage.removeItem("loginUser");
   location.reload();
 };
 

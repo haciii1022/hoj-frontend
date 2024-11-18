@@ -4,7 +4,7 @@
     <a-form :model="searchParms" layout="inline" style="min-width: 240px">
       <a-form-item field="questionId" label="题号">
         <a-input
-          v-model="searchParms.questionId"
+          :v-model="searchParms.questionId"
           placeholder="请输入题号"
         ></a-input>
       </a-form-item>

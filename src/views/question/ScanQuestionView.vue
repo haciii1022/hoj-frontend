@@ -62,60 +62,76 @@
             :handle-change="changeCode"
           />
         </div>
-        <a-spin :loading="loading" tip="已提交，正在查询结果...">
-          <div class="custom-scroll3">
-            <a-divider size:0 />
-            <a-button type="primary" style="min-width: 200px" @click="doSubmit"
-              >提交代码
-            </a-button>
-            <div v-if="questionSubmitVO">
-              <a-tag
-                v-if="questionSubmitVO.judgeInfo?.message == 'Accepted'"
-                color="green"
-              >
-                {{ questionSubmitVO.judgeInfo.message }}
-              </a-tag>
-              <a-tag
-                v-else-if="
-                  questionSubmitVO.judgeInfo?.message == 'Compile Error'
-                "
-                color="orange"
-              >
-                {{ questionSubmitVO.judgeInfo.message }}
-              </a-tag>
-              <a-tag
-                v-else-if="
-                  questionSubmitVO.judgeInfo?.message == 'System Error'
-                "
-                color="blue"
-              >
-                {{ questionSubmitVO.judgeInfo.message }}
-              </a-tag>
-              <a-tag v-else color="red">
-                {{ questionSubmitVO.judgeInfo?.message }}
-              </a-tag>
-              <div
-                v-if="
-                  questionSubmitVO.judgeInfo?.memory != null &&
-                  questionSubmitVO.judgeInfo?.memory < 1024 * 1024
-                "
-              >
-                <!-- 默认KB为单位-->
-                {{ questionSubmitVO.judgeInfo!!.memory / 1024 }} KB
-              </div>
-              <div v-else-if="questionSubmitVO.judgeInfo?.memory != null">
-                <!-- 超过了1024KB才会转化成MB-->
-                {{
-                  (questionSubmitVO.judgeInfo.memory / (1024 * 1024)).toFixed(2)
-                }}
-                MB
-              </div>
-              <div v-if="questionSubmitVO.judgeInfo?.time != null">
-                {{ questionSubmitVO.judgeInfo.time }} ms
+        <div class="custom-scroll3">
+          <a-spin
+            :loading="loading"
+            tip="已提交，正在查询结果..."
+            style="width: 49vw"
+          >
+            <a-space />
+            <div style="display: flex">
+              <a-button
+                type="primary"
+                style="min-width: 150px; margin: 0 20px"
+                @click="doSubmit"
+                >提交代码
+              </a-button>
+              <div v-if="questionSubmitVO?.length > 0">
+                <a-table
+                  :columns="columns"
+                  :data="questionSubmitVO"
+                  :pagination="false"
+                  row-height="50"
+                >
+                  <template #info="{ record }">
+                    <a-tag
+                      v-if="record.judgeInfo?.message == 'Accepted'"
+                      color="green"
+                    >
+                      {{ record.judgeInfo.message }}
+                    </a-tag>
+                    <a-tag
+                      v-else-if="record.judgeInfo?.message == 'Compile Error'"
+                      color="orange"
+                    >
+                      {{ record.judgeInfo.message }}
+                    </a-tag>
+                    <a-tag
+                      v-else-if="record.judgeInfo?.message == 'System Error'"
+                      color="blue"
+                    >
+                      {{ record.judgeInfo.message }}
+                    </a-tag>
+                    <a-tag v-else color="red">
+                      {{ record.judgeInfo?.message }}
+                    </a-tag>
+                  </template>
+                  <template #time="{ record }">
+                    <div
+                      v-if="
+                        record.judgeInfo?.memory != null &&
+                        record.judgeInfo?.memory < 1024 * 1024
+                      "
+                    >
+                      <!-- 默认KB为单位-->
+                      {{ record.judgeInfo!!.memory / 1024 }} KB
+                    </div>
+                    <div v-else-if="record.judgeInfo?.memory != null">
+                      <!-- 超过了1024KB才会转化成MB-->
+                      {{ (record.judgeInfo.memory / (1024 * 1024)).toFixed(2) }}
+                      MB
+                    </div>
+                  </template>
+                  <template #memory="{ record }">
+                    <div v-if="record.judgeInfo?.time != null">
+                      {{ record.judgeInfo.time }} ms
+                    </div>
+                  </template>
+                </a-table>
               </div>
             </div>
-          </div>
-        </a-spin>
+          </a-spin>
+        </div>
       </a-col>
     </a-row>
   </div>
@@ -141,13 +157,27 @@ const props = withDefaults(defineProps<Props>(), {
   id: () => 0,
 });
 const question = ref<QuestionVO>();
-const questionSubmitVO = ref<QuestionSubmitVO>();
+const questionSubmitVO = ref<Array<QuestionSubmitVO>>([]);
 const loading = ref(false);
 const form = ref<QuestionSubmitAddRequest>({
   language: "java",
   code: "",
   questionId: props.id,
 });
+const columns = [
+  {
+    title: "判题结果",
+    slotName: "info",
+  },
+  {
+    title: "消耗时间",
+    slotName: "time",
+  },
+  {
+    title: "消耗内存",
+    slotName: "memory",
+  },
+];
 const loadData = async () => {
   const res = await QuestionControllerService.getQuestionVoByIdUsingGet(
     props.id
@@ -196,7 +226,7 @@ const getSubmitStatus = async (id: number) => {
       submitVO.status === 1
     );
     loading.value = false;
-    questionSubmitVO.value = submitVO;
+    questionSubmitVO.value[0] = submitVO;
   } catch (error) {
     console.error("Failed to get submit status:", error);
     // 处理错误，例如重试或者通知用户
@@ -227,7 +257,9 @@ body {
 }
 
 .custom-scroll3 {
-  height: 20vh; /* 根据需要调整高度 */
+  height: 15vh; /* 根据需要调整高度 */
+  width: 100%;
+  display: flex;
   overflow: auto;
 }
 </style>

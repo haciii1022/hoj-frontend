@@ -197,5 +197,7 @@ watchEffect(() => {
 
 <style scoped>
 #addQuestionView {
+  max-width: 85vw;
+  margin: 0 auto;
 }
 </style>

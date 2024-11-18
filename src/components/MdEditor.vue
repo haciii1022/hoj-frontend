@@ -4,6 +4,7 @@
     :mode="mode"
     :plugins="plugins"
     :locale="zhHans"
+    class="custom-editor"
     @change="handleChange"
   />
 </template>
@@ -15,7 +16,6 @@ import highlight from "@bytemd/plugin-highlight";
 import math from "@bytemd/plugin-math";
 import { Editor, Viewer } from "@bytemd/vue-next";
 import zhHans from "bytemd/locales/zh_Hans.json";
-import zhHan from "@bytemd/plugin-math/locales/zh_Hans.json"; // 汉化
 import "katex/dist/katex.css";
 import "highlight.js/styles/atom-one-dark.min.css";
 import "bytemd/dist/index.css";
@@ -49,5 +49,9 @@ const props = withDefaults(defineProps<Props>(), {
 <style>
 .bytemd-toolbar-icon.bytemd-tippy.bytemd-tippy-right:last-child {
   display: none;
+}
+.bytemd {
+  height: 550px;
+  border-radius: 8px;
 }
 </style>

@@ -19,6 +19,7 @@
     "@bytemd/plugin-medium-zoom": "^1.21.0",
     "@bytemd/vue-next": "^1.21.0",
     "axios": "^1.7.2",
+    "bytemd": "^1.21.0",
     "core-js": "^3.8.3",
     "github-markdown-css": "^5.6.1",
     "highlight.js": "^11.10.0",

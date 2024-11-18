@@ -156,7 +156,7 @@ watchEffect(() => {
 
 <style scoped>
 #questionListView {
-  max-width: 1280px;
+  max-width: 85vw;
   margin: 0 auto;
 }
 </style>
