@@ -44,4 +44,7 @@ const _ = (window as any).ResizeObserver;
 #app {
   height: 100vh;
 }
+body {
+  user-select: none; /* 禁止文字选中 */
+}
 </style>

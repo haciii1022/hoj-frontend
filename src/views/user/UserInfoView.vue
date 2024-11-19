@@ -6,7 +6,7 @@
         <a-form :model="form" label-align="left" auto-label-width>
           <a-row :gutter="40">
             <a-col :span="14">
-              <a-form-item field="userName" label="用户昵称" required>
+              <a-form-item field="userName" label="用户昵称">
                 <a-input v-model="form.userName" />
               </a-form-item>
             </a-col>
@@ -50,7 +50,7 @@
         <a-row :gutter="40">
           <a-col :span="24">
             <a-form-item field="userName" label="用户简介">
-              <UserProfileMdEditor
+              <MdEditor
                 :value="form.userProfile"
                 :handle-change="onProfileChange"
               />
@@ -110,7 +110,7 @@ import {
 import { Message } from "@arco-design/web-vue";
 import { useRouter } from "vue-router";
 import store from "@/store";
-import UserProfileMdEditor from "@/components/UserProfileMdEditor.vue";
+import MdEditor from "@/components/MdEditor.vue";
 
 const fileInput = ref<HTMLInputElement | null>(null);
 const file = ref<File | null>(null); // 定义文件的ref，并指定类型
@@ -191,7 +191,7 @@ const uploadFile = async (file: File) => {
   }
 };
 const handlePasswordSubmit = async () => {
-  passwordFormRef.value.validate((valid: any) => {
+  passwordFormRef.value.validate((valid: object) => {
     console.log("status: " + JSON.stringify(valid));
     if (valid == null) {
       // 校验通过后调用 API 更新密码
@@ -267,5 +267,10 @@ onMounted(() => {
 
 .avatar-container {
   width: 30%;
+}
+
+:deep(.bytemd) {
+  height: 250px;
+  border-radius: 8px;
 }
 </style>

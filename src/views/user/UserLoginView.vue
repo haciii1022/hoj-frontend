@@ -20,9 +20,9 @@
 
       <a-form-item>
         <a-button html-type="submit" type="primary" style="width: 120px"
-          >登录</a-button
-        >
-        <a-anchor-link href="/user/register">没有账号？去注册</a-anchor-link>
+          >登录
+        </a-button>
+        <a-link class="myLink" href="/user/register">没有账号？去注册 </a-link>
       </a-form-item>
     </a-form>
     {{ form }}
@@ -58,4 +58,18 @@ const handleSubmit = async () => {
 };
 </script>
 
-<style></style>
+<style>
+.myLink {
+  margin-top: 10px;
+  text-decoration: none; /* 去掉下划线 */
+  color: #007bff; /* 默认颜色 */
+  font-weight: 500; /* 字体加粗 */
+  transition: all 0.3s ease; /* 平滑过渡 */
+  cursor: pointer; /* 鼠标变为手型 */
+}
+
+.myLink:hover {
+  color: #0056b3; /* 悬停时的颜色 */
+  text-decoration: underline; /* 悬停时添加下划线 */
+}
+</style>

@@ -30,9 +30,9 @@
       }"
     >
       <template #tags="{ record }">
-        <a-tag v-for="(tag, index) of record.tags" :key="index">{{
-          tag
-        }}</a-tag>
+        <a-tag v-for="(tag, index) of record.tags" :key="index"
+          >{{ tag }}
+        </a-tag>
       </template>
       <template #acceptRate="{ record }">
         {{
@@ -48,8 +48,8 @@
       <template #optional="{ record }">
         <a-space>
           <a-button type="primary" @click="doQuestionPage(record)"
-            >详情</a-button
-          >
+            >详情
+          </a-button>
         </a-space>
       </template>
     </a-table>
@@ -157,6 +157,9 @@ watchEffect(() => {
 <style scoped>
 #questionListView {
   max-width: 85vw;
-  margin: 0 auto;
+  background-color: #d3d3d3;
+  border-radius: 10px; /* 边框弧度 */
+  padding: 10px 30px;
+  margin: 20px auto;
 }
 </style>

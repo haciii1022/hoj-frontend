@@ -1,16 +1,30 @@
 <template>
   <div id="addQuestionView">
     <div class="main-content">
-      <a-form :model="form" label-align="left" layout="vertical">
+      <a-form :model="form" label-align="left" layout="vertical" ref="formRef">
         <a-row :gutter="40">
           <a-col :span="6">
-            <a-form-item field="title" label="题目ID">
-              <a-input v-model="form.title" placeholder="P1000" allow-clear />
+            <a-form-item
+              field="id"
+              label="题目ID"
+              required
+              style="user-select: none"
+            >
+              <a-input :v-model="form.id" placeholder="P1000" disabled />
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item field="title" label="标题">
-              <a-input v-model="form.title" placeholder="P1000" allow-clear />
+            <a-form-item
+              field="title"
+              label="标题"
+              :rules="[{ required: true, message: '标题不能为空' }]"
+              :validate-trigger="['blur']"
+            >
+              <a-input
+                v-model="form.title"
+                placeholder="请输入标题"
+                allow-clear
+              />
             </a-form-item>
           </a-col>
           <a-col :span="6">
@@ -33,27 +47,33 @@
         <a-row :gutter="40">
           <a-col :span="6">
             <a-form-item
-              field="data.judgeConfig.timeLimit"
+              field="judgeConfig.timeLimit"
               label="时间限制"
               label-col-flex="200px"
+              :rules="[{ required: true, message: '时间限制不能为空' }]"
             >
-              <a-input
-                :v-model="form.judgeConfig.timeLimit"
+              <a-input-number
+                v-model="form.judgeConfig.timeLimit"
                 placeholder="请输入"
-                allow-clear
+                :min="0"
               >
                 <template #append> ms</template>
-              </a-input>
+              </a-input-number>
             </a-form-item>
           </a-col>
           <a-col :span="6">
-            <a-form-item field="data.judgeConfig.memoryLimit" label="内存限制">
-              <a-input
-                :v-model="form.judgeConfig.memoryLimit"
+            <a-form-item
+              field="judgeConfig.memoryLimit"
+              label="内存限制"
+              :rules="[{ required: true, message: '内存限制不能为空' }]"
+            >
+              <a-input-number
+                v-model="form.judgeConfig.memoryLimit"
                 placeholder="请输入"
+                :min="0"
               >
                 <template #append> KB</template>
-              </a-input>
+              </a-input-number>
             </a-form-item>
           </a-col>
         </a-row>
@@ -70,6 +90,7 @@
       </a-form>
     </div>
     <div class="side-content">
+      {{ form }}
       <div class="submit-info"></div>
       <div class="upload-file"></div>
       <div class="upload-file"></div>
@@ -84,6 +105,7 @@ import { Message } from "@arco-design/web-vue";
 import { useRoute, useRouter } from "vue-router";
 
 let form = ref({
+  id: 0,
   answer:
     "# Background\n" +
     "Special for beginners, ^_^\n" +
@@ -115,8 +137,8 @@ let form = ref({
   tags: [],
   title: "",
   judgeConfig: {
-    timeLimit: 0,
-    memoryLimit: 0,
+    timeLimit: 1000,
+    memoryLimit: 1000,
     stackLimit: 0,
   },
   judgeCase: [
@@ -128,6 +150,7 @@ let form = ref({
 });
 const router = useRouter();
 const route = useRoute();
+const formRef = ref();
 //如果页面地址包含 update. 则为更新页面
 const updatePage = route.path.includes("update");
 
@@ -193,6 +216,10 @@ const onContentChange = (v: string) => {
 
 const doSubmit = async () => {
   console.log(JSON.stringify(form));
+  const isValid = await formRef.value.validate();
+  if (isValid !== undefined) {
+    return;
+  }
   if (updatePage) {
     const res = await QuestionControllerService.updateQuestionUsingPost(
       form.value
@@ -202,7 +229,7 @@ const doSubmit = async () => {
       setTimeout(() => {
         window.location.reload(); // 刷新页面
         router.push({
-          path: "/question/add",
+          path: "/question/add2",
           replace: true,
         });
       }, 1000); // 延迟1秒
@@ -271,7 +298,8 @@ const doSubmit = async () => {
   margin-bottom: 40px;
   background-color: #d3d3d3;
 }
-.bytemd {
+
+:deep(.bytemd) {
   height: 550px;
   border-radius: 8px;
 }
