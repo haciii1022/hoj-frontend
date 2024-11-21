@@ -79,7 +79,7 @@ export const routes: Array<RouteRecordRaw> = [
   {
     path: "/question/update",
     name: "更新题目",
-    component: AddQuestionView,
+    component: AddQuestionView2,
     meta: {
       access: ACCESS_ENUM.ADMIN,
       hideInMenu: true,

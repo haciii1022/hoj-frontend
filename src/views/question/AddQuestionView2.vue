@@ -79,7 +79,7 @@
         </a-row>
         <a-row :gutter="40">
           <a-col :span="24">
-            <MdEditor :value="form.answer" :handle-change="onAnswerChange" />
+            <MdEditor :value="form.content" :handle-change="onContentChange" />
           </a-col>
         </a-row>
         <a-row :gutter="40" style="margin-top: 20px">
@@ -90,17 +90,108 @@
       </a-form>
     </div>
     <div class="side-content">
-      {{ form }}
+      {{ judgeCaseGroupList }}
       <div class="submit-info"></div>
-      <div class="upload-file"></div>
-      <div class="upload-file"></div>
+      <a-card title="判题数据" class="upload-file" :bordered="false">
+        <template #extra>
+          <a-button type="text" @click="addJudgeCaseGroup">新增数据组</a-button>
+        </template>
+        <input
+          type="file"
+          accept=".in,.out"
+          ref="fileInput"
+          @change="handleFileUpload"
+          style="display: none"
+        />
+        <a-card-grid
+          v-for="(group, index) in judgeCaseGroupList"
+          :key="index"
+          :style="{ width: '100%' }"
+        >
+          <a-card
+            class="card-demo"
+            :title="`数据组-${index + 1}`"
+            :bordered="false"
+          >
+            <template #extra>
+              <a-tooltip content="一组只能有一个in文件以及out文件">
+                <a-button
+                  type="text"
+                  @click="triggerFileInputClick(group.id as number)"
+                  >上传文件
+                </a-button>
+              </a-tooltip>
+              <a-popconfirm
+                content="你确认要删除吗？"
+                type="warning"
+                @ok="handleDelete(group.id as number)"
+              >
+                <a-button type="text" size="mini">
+                  <template #icon
+                    ><img alt="删除" src="../../assets/delete.svg"
+                  /></template>
+                </a-button>
+              </a-popconfirm>
+            </template>
+            <div
+              v-if="group.inputFile"
+              :style="{
+                margin: 0,
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }"
+            >
+              <a-link :href="group.inputFile?.url">
+                {{ group.inputFile?.fileName }}
+              </a-link>
+              <a-popconfirm
+                content="你确认要删除吗？"
+                type="warning"
+                @ok="handleDelete(group.inputFile.id as number)"
+              >
+                <a-button type="text" size="mini">
+                  <template #icon
+                    ><img alt="删除" src="../../assets/delete.svg"
+                  /></template>
+                </a-button>
+              </a-popconfirm>
+            </div>
+            <div
+              v-if="group.outputFile"
+              :style="{
+                margin: 0,
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }"
+            >
+              <a-link :href="group.outputFile?.url">
+                {{ group.outputFile?.fileName }}
+              </a-link>
+              <a-button
+                type="text"
+                @click="handleDelete(group.outputFile?.id as number)"
+                size="mini"
+              >
+                <template #icon
+                  ><img alt="删除" src="../../assets/delete.svg"
+                /></template>
+              </a-button>
+            </div>
+          </a-card>
+        </a-card-grid>
+      </a-card>
     </div>
   </div>
 </template>
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import MdEditor from "@/components/MdEditor.vue";
-import { QuestionControllerService } from "../../../generated";
+import {
+  JudgeCaseGroupVO,
+  QuestionControllerService,
+} from "../../../generated";
 import { Message } from "@arco-design/web-vue";
 import { useRoute, useRouter } from "vue-router";
 
@@ -148,23 +239,28 @@ let form = ref({
     },
   ],
 });
+
+let judgeCaseGroupList = ref([] as JudgeCaseGroupVO[]);
+const fileInput = ref<HTMLInputElement | null>(null);
+const currentGroupId = ref();
 const router = useRouter();
 const route = useRoute();
 const formRef = ref();
 //如果页面地址包含 update. 则为更新页面
 const updatePage = route.path.includes("update");
 
-const lodaData = async () => {
+const loadData = async () => {
   let id = route.query.id;
   if (!id) {
     return;
   }
-  const res = await QuestionControllerService.getQuestionByIdUsingGet(
+  const res1 = await QuestionControllerService.getQuestionByIdUsingGet(
     id as any
   );
-  if (res.code === 0) {
-    form.value = res.data as any;
-    if (res.data?.judgeConfig == null) {
+  if (res1.code === 0) {
+    form.value = res1.data as any;
+    await loadJudgeCaseData(id);
+    if (res1.data?.judgeConfig == null) {
       form.value.judgeConfig = {
         timeLimit: 1000,
         memoryLimit: 1000,
@@ -172,9 +268,9 @@ const lodaData = async () => {
       };
     } else {
       // TODO 后续可以改成后端处理好返回给前端  下面的方法也是一致
-      form.value.judgeConfig = JSON.parse(res.data.judgeConfig);
+      form.value.judgeConfig = JSON.parse(res1.data.judgeConfig);
     }
-    if (res.data?.judgeCase == null) {
+    if (res1.data?.judgeCase == null) {
       form.value.judgeCase = [
         {
           input: "",
@@ -182,36 +278,119 @@ const lodaData = async () => {
         },
       ];
     } else {
-      form.value.judgeCase = JSON.parse(res.data.judgeCase);
+      form.value.judgeCase = JSON.parse(res1.data.judgeCase);
     }
-    if (res.data?.tags != null) {
-      form.value.tags = JSON.parse(res.data.tags);
+    if (res1.data?.tags != null) {
+      form.value.tags = JSON.parse(res1.data.tags);
     }
-    console.log("data " + JSON.stringify(res.data));
+    console.log("data " + JSON.stringify(res1.data));
     console.log("form " + JSON.stringify(form.value));
   } else {
     Message.error("获取数据失败");
   }
 };
+
+const loadJudgeCaseData = async (questionId: any) => {
+  const res2 =
+    await QuestionControllerService.getJudgeCaseGroupListByQuestionIdUsingGet(
+      questionId
+    );
+  if (res2.code === 0) {
+    judgeCaseGroupList.value = res2.data as any;
+  } else {
+    Message.error("获取数据失败");
+  }
+};
+
 onMounted(() => {
-  lodaData();
+  loadData();
 });
+
 const handleAdd = () => {
   form.value.judgeCase?.push({
     input: "",
     output: "",
   });
 };
-const handleDelete = (index: number) => {
-  form.value.judgeCase?.splice(index, 1);
-};
-
-const onAnswerChange = (v: string) => {
-  form.value.answer = v;
+const handleDelete = async (fileId: number) => {
+  QuestionControllerService.deleteJudgeCaseFileUsingGet(fileId)
+    .then((res) => {
+      if (res.code === 0) {
+        Message.success("删除成功");
+        loadJudgeCaseData(form.value.id);
+      } else {
+        Message.error("删除失败, " + res.message);
+      }
+    })
+    .catch((error) => {
+      Message.error("删除请求失败: " + error.message);
+    });
 };
 
 const onContentChange = (v: string) => {
   form.value.content = v;
+};
+
+const addJudgeCaseGroup = async () => {
+  const questionId = form.value.id;
+  const res = await QuestionControllerService.addJudgeCaseGroupUsingPost({
+    questionId,
+  });
+  if (res.code === 0) {
+    Message.success("新增成功");
+    await loadJudgeCaseData(questionId);
+  } else {
+    Message.error("新增失败, " + res.message);
+  }
+};
+
+const handleFileUpload = async (event: Event) => {
+  const input = event.target as HTMLInputElement;
+  if (!input.files || input.files.length === 0) {
+    Message.warning("请选择文件后再上传！");
+    return;
+  }
+  const file = input.files[0];
+  const fileName = file.name; // 获取文件名
+  const fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1); // 提取文件后缀
+  console.log("文件后缀： " + fileExtension);
+  // 获取文件后缀
+  const type = fileExtension === "in" ? 0 : 1;
+  const data = {
+    questionId: form.value.id,
+    groupId: currentGroupId.value,
+    type: type,
+  };
+  const jsonData = JSON.stringify(data);
+
+  try {
+    const res = await QuestionControllerService.addJudgeCaseFileUsingPost(
+      file,
+      jsonData
+    );
+    if (res.code === 0) {
+      Message.success("文件上传成功！");
+      // 上传成功后刷新当前数据组列表
+      const questionId = form.value.id;
+      await loadJudgeCaseData(questionId);
+    } else {
+      Message.error(`文件上传失败: ${res.message}`);
+    }
+  } catch (error) {
+    Message.error("文件上传失败，请重试！");
+  }
+
+  // 清空文件选择器的值，避免重复上传相同文件时事件不触发
+  input.value = "";
+};
+const triggerFileInputClick = (groupId: number) => {
+  if (fileInput.value) {
+    currentGroupId.value = groupId;
+    fileInput.value.click();
+  }
+};
+const test = () => {
+  alert(1);
 };
 
 const doSubmit = async () => {
@@ -275,7 +454,7 @@ const doSubmit = async () => {
 .side-content {
   border-radius: 16px; /* 边框弧度 */
   padding: 0 30px;
-  width: 20%;
+  width: 17%;
   margin: 20px 50px 10px 0;
   height: 1000px;
   display: flex;
@@ -287,6 +466,7 @@ const doSubmit = async () => {
   border-radius: 16px; /* 边框弧度 */
   width: 100%;
   height: 300px;
+  padding: 5px 15px;
   margin-bottom: 40px;
   background-color: #d3d3d3;
 }
@@ -294,9 +474,10 @@ const doSubmit = async () => {
 .upload-file {
   border-radius: 16px; /* 边框弧度 */
   width: 100%;
-  height: 400px;
+  height: 600px;
+  padding: 5px 15px;
   margin-bottom: 40px;
-  background-color: #d3d3d3;
+  background-color: #f6f5f5;
 }
 
 :deep(.bytemd) {
