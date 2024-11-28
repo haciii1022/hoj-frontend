@@ -182,10 +182,13 @@ const uploadFile = async (file: File) => {
   );
   if (res.code === 0) {
     // 重新加载获取新头像
-    await loadData();
-    // 为了头像能够实时刷新
-    await store.dispatch("user/getLoginUser");
+    // await loadData();
+    // // 为了头像能够实时刷新
+    // await store.dispatch("user/getLoginUser");
     Message.success("头像更新成功");
+    setTimeout(() => {
+      window.location.reload(); // 刷新浏览器页面
+    }, 400); // 延迟 1 秒
   } else {
     Message.error("头像上传失败， " + res.message);
   }

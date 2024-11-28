@@ -10,7 +10,7 @@
               required
               style="user-select: none"
             >
-              <a-input :v-model="form.id" placeholder="P1000" disabled />
+              <a-input v-model="form.id" placeholder="P1000" disabled />
             </a-form-item>
           </a-col>
           <a-col :span="12">
@@ -89,8 +89,7 @@
         </a-row>
       </a-form>
     </div>
-    <div class="side-content">
-      {{ judgeCaseGroupList }}
+    <div class="side-content" v-if="route.query.id">
       <div class="submit-info"></div>
       <a-card title="判题数据" class="upload-file" :bordered="false">
         <template #extra>
@@ -134,6 +133,7 @@
               </a-popconfirm>
             </template>
             <div
+              class="file-row"
               v-if="group.inputFile"
               :style="{
                 margin: 0,
@@ -142,7 +142,7 @@
                 alignItems: 'center',
               }"
             >
-              <a-link :href="group.inputFile?.url">
+              <a-link :href="OpenAPI.BASE + fileUrl + group.inputFile.id">
                 {{ group.inputFile?.fileName }}
               </a-link>
               <a-popconfirm
@@ -150,14 +150,15 @@
                 type="warning"
                 @ok="handleDelete(group.inputFile.id as number)"
               >
-                <a-button type="text" size="mini">
+                <a-button type="text" size="mini" class="delete-button">
                   <template #icon
-                    ><img alt="删除" src="../../assets/delete.svg"
+                    ><img alt="删除" src="../../assets/delete2.svg"
                   /></template>
                 </a-button>
               </a-popconfirm>
             </div>
             <div
+              class="file-row"
               v-if="group.outputFile"
               :style="{
                 margin: 0,
@@ -166,18 +167,20 @@
                 alignItems: 'center',
               }"
             >
-              <a-link :href="group.outputFile?.url">
+              <a-link :href="OpenAPI.BASE + fileUrl + group.outputFile.id">
                 {{ group.outputFile?.fileName }}
               </a-link>
-              <a-button
-                type="text"
-                @click="handleDelete(group.outputFile?.id as number)"
-                size="mini"
+              <a-popconfirm
+                content="你确认要删除吗？"
+                type="warning"
+                @ok="handleDelete(group.outputFile.id as number)"
               >
-                <template #icon
-                  ><img alt="删除" src="../../assets/delete.svg"
-                /></template>
-              </a-button>
+                <a-button class="delete-button" type="text" size="mini">
+                  <template #icon
+                    ><img alt="删除" src="../../assets/delete2.svg"
+                  /></template>
+                </a-button>
+              </a-popconfirm>
             </div>
           </a-card>
         </a-card-grid>
@@ -190,14 +193,15 @@ import { onMounted, ref } from "vue";
 import MdEditor from "@/components/MdEditor.vue";
 import {
   JudgeCaseGroupVO,
+  OpenAPI,
   QuestionControllerService,
 } from "../../../generated";
 import { Message } from "@arco-design/web-vue";
 import { useRoute, useRouter } from "vue-router";
-
+const fileUrl = "/api/question/judgeCaseFile/download?fileId=";
 let form = ref({
-  id: 0,
-  answer:
+  id: "0",
+  content:
     "# Background\n" +
     "Special for beginners, ^_^\n" +
     "\n" +
@@ -224,7 +228,7 @@ let form = ref({
     "\n" +
     "# Limitation\n" +
     "1s, 1024KiB for each test case.\n",
-  content: "",
+  answer: "",
   tags: [],
   title: "",
   judgeConfig: {
@@ -252,6 +256,13 @@ const updatePage = route.path.includes("update");
 const loadData = async () => {
   let id = route.query.id;
   if (!id) {
+    const res = await QuestionControllerService.getNextQuestionIdUsingGet();
+    if (res.code === 0) {
+      // form.value.id = Number(res.data);
+      console.log("form " + JSON.stringify(form.value));
+    } else {
+      Message.error("生成题目ID失败");
+    }
     return;
   }
   const res1 = await QuestionControllerService.getQuestionByIdUsingGet(
@@ -259,6 +270,7 @@ const loadData = async () => {
   );
   if (res1.code === 0) {
     form.value = res1.data as any;
+    // form.value.id = Number(form.value.id);
     await loadJudgeCaseData(id);
     if (res1.data?.judgeConfig == null) {
       form.value.judgeConfig = {
@@ -317,6 +329,7 @@ const handleDelete = async (fileId: number) => {
     .then((res) => {
       if (res.code === 0) {
         Message.success("删除成功");
+        console.log("del_questionId: " + form.value.id);
         loadJudgeCaseData(form.value.id);
       } else {
         Message.error("删除失败, " + res.message);
@@ -332,12 +345,13 @@ const onContentChange = (v: string) => {
 };
 
 const addJudgeCaseGroup = async () => {
-  const questionId = form.value.id;
+  const questionId = form.value.id as any;
   const res = await QuestionControllerService.addJudgeCaseGroupUsingPost({
     questionId,
   });
   if (res.code === 0) {
     Message.success("新增成功");
+    console.log("add_questionId: " + questionId);
     await loadJudgeCaseData(questionId);
   } else {
     Message.error("新增失败, " + res.message);
@@ -389,9 +403,6 @@ const triggerFileInputClick = (groupId: number) => {
     fileInput.value.click();
   }
 };
-const test = () => {
-  alert(1);
-};
 
 const doSubmit = async () => {
   console.log(JSON.stringify(form));
@@ -401,7 +412,7 @@ const doSubmit = async () => {
   }
   if (updatePage) {
     const res = await QuestionControllerService.updateQuestionUsingPost(
-      form.value
+      form.value as any
     );
     if (res.code === 0) {
       Message.success("题目更新成功");
@@ -483,5 +494,18 @@ const doSubmit = async () => {
 :deep(.bytemd) {
   height: 550px;
   border-radius: 8px;
+}
+
+.file-row {
+  position: relative;
+}
+
+.delete-button {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.file-row:hover .delete-button {
+  opacity: 1;
 }
 </style>

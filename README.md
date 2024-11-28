@@ -11,6 +11,7 @@
 ```bash
 openapi --input http://ip:port/api/v2/api-docs --output ./generated --client axios
 ```
+注意，此处生成的接口SameSite默认为Lax级别，如果需要自定义，需要修改生成的代码
 
 
 
