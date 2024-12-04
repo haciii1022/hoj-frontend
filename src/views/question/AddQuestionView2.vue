@@ -258,8 +258,8 @@ const loadData = async () => {
   if (!id) {
     const res = await QuestionControllerService.getNextQuestionIdUsingGet();
     if (res.code === 0) {
-      // form.value.id = Number(res.data);
-      console.log("form " + JSON.stringify(form.value));
+      form.value.id = res.data;
+      console.log("id " + JSON.stringify(form.value));
     } else {
       Message.error("生成题目ID失败");
     }

@@ -1,15 +1,15 @@
 <template>
   <div id="questionSubmitListView">
     <h2>题目列表</h2>
-    <a-form :model="searchParms" layout="inline" style="min-width: 240px">
+    <a-form :model="searchParams" layout="inline" style="min-width: 240px">
       <a-form-item field="questionId" label="题号">
         <a-input
-          :v-model="searchParms.questionId"
+          :v-model="searchParams.questionId"
           placeholder="请输入题号"
         ></a-input>
       </a-form-item>
       <a-form-item field="language" label="语言" style="min-width: 240px">
-        <a-select v-model="searchParms.language" placeholder="选择编程语言">
+        <a-select v-model="searchParams.language" placeholder="选择编程语言">
           <a-option>java</a-option>
           <a-option>python</a-option>
           <a-option>cpp</a-option>
@@ -25,9 +25,9 @@
       @page-change="doPageChange"
       @page-size-change="doPageSizeChange"
       :pagination="{
-        pageSize: searchParms.pageSize,
+        pageSize: searchParams.pageSize,
         pageSizeOptions: [5, 10, 15, 20],
-        current: searchParms.current,
+        current: searchParams.current,
         total: total,
         showTotal: true,
         showPageSize: true,
@@ -54,13 +54,13 @@
         <div v-else-if="record.status === 2">成功</div>
         <div v-else-if="record.status === 3">失败</div>
       </template>
-      <template #questionId="{ record }">
+      <template #question="{ record }">
         <a
           :href="`/question/list/${record.questionId}`"
           class="custom-link"
           v-if="record.questionId"
         >
-          {{ record.questionId }}
+          {{ record.questionVO.title }}
         </a>
       </template>
       <template #judgeInfo="{ record }">
@@ -85,8 +85,8 @@
           </a-tag>
         </div>
         <div v-else>
-          <a-tag v-if="record.status == 0" color="gray"> Waiting </a-tag>
-          <a-tag v-else-if="record.status == 1" color="orange"> Running </a-tag>
+          <a-tag v-if="record.status == 0" color="gray"> Waiting</a-tag>
+          <a-tag v-else-if="record.status == 1" color="orange"> Running</a-tag>
         </div>
       </template>
       <template #memory="{ record }">
@@ -112,13 +112,6 @@
       <template #createTime="{ record }">
         {{ moment(record.createTime).format("YYYY-MM-DD HH:mm:ss") }}
       </template>
-      <!--      <template #optional="{ record }">-->
-      <!--        <a-space>-->
-      <!--          <a-button type="primary" @click="doQuestionPage(record)"-->
-      <!--            >详情-->
-      <!--          </a-button>-->
-      <!--        </a-space>-->
-      <!--      </template>-->
     </a-table>
   </div>
 </template>
@@ -133,10 +126,10 @@ import { Message } from "@arco-design/web-vue";
 import { useRouter } from "vue-router";
 import moment from "moment";
 
-const dataList = ref([] as QuestionSubmitVO[]);
+const dataList = ref<QuestionSubmitVO[]>([]);
 const total = ref(1);
 const router = useRouter();
-const searchParms = ref<QuestionSubmitQueryRequest>({
+const searchParams = ref<QuestionSubmitQueryRequest>({
   questionId: undefined,
   language: undefined,
   pageSize: 5,
@@ -149,11 +142,12 @@ onMounted(() => {
 });
 const loadData = async () => {
   const res = await QuestionControllerService.listQuestionSubmitByPageUsingPost(
-    searchParms.value
+    searchParams.value
   );
   if (res.code === 0) {
     dataList.value = res.data.records;
     total.value = res.data.total;
+    console.log("list: " + JSON.stringify(dataList));
   } else {
     Message.error("获取题目提交列表失败, " + res.message);
   }
@@ -188,15 +182,12 @@ const columns = [
     slotName: "memory",
   },
   {
-    title: "题目ID",
-    slotName: "questionId",
-    // dataIndex: "questionId",
-    // key: "questionId",
+    title: "题目",
+    slotName: "question",
   },
   {
-    title: "提交者ID",
-    dataIndex: "userId",
-    key: "userId",
+    title: "提交者",
+    dataIndex: "userVO.userName",
   },
   {
     title: "创建时间",
@@ -214,26 +205,26 @@ const doQuestionPage = async (question: QuestionSubmitVO) => {
   });
 };
 const doSearch = async () => {
-  searchParms.value = {
-    ...searchParms.value,
+  searchParams.value = {
+    ...searchParams.value,
     current: 1,
   };
   // await loadData();
 };
 const doPageChange = async (pageNumber: number) => {
-  searchParms.value = {
-    ...searchParms.value,
+  searchParams.value = {
+    ...searchParams.value,
     current: pageNumber,
   };
 };
 const doPageSizeChange = async (pageSize: number) => {
-  searchParms.value = {
-    ...searchParms.value,
+  searchParams.value = {
+    ...searchParams.value,
     pageSize: pageSize,
   };
 };
 /**
- * 监听searchParms变量，改变时触发loadData()
+ * 监听searchParams变量，改变时触发loadData()
  */
 watchEffect(() => {
   loadData();
@@ -248,15 +239,15 @@ watchEffect(() => {
 
 /* 定义超链接样式 */
 .custom-link {
-  color: blue; /* 初始颜色 */
+  color: rgb(var(--arcoblue-6)); /* 初始颜色 */
   text-decoration: none; /* 去掉下划线 */
 }
 
 .custom-link:hover {
-  color: orange; /* 悬停颜色 */
+  color: rgb(var(--red-5)); /* 悬停颜色 */
 }
 
 .custom-link:active {
-  color: blue; /* 点击后的颜色 */
+  color: rgb(var(--arcoblue-7)); /* 点击后的颜色 */
 }
 </style>

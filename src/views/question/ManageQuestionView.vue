@@ -1,5 +1,5 @@
 <template>
-  <div id="addQuestionView">
+  <div id="manageQuestionView">
     <h2>管理题目</h2>
     <a-table
       :columns="columns"
@@ -18,10 +18,25 @@
     >
       <template #optional="{ record }">
         <a-space>
-          <a-button type="primary" @click="doUpdate(record)">修改</a-button>
-
-          <a-button status="danger" @click="doDelete(record)">删除</a-button>
+          <a-button size="mini" type="text" @click="doUpdate(record)"
+            >修改
+          </a-button>
+          <a-button size="mini" status="danger" @click="doDelete(record)"
+            >删除
+          </a-button>
         </a-space>
+      </template>
+      <template #tags="{ record }">
+        <a-tag
+          v-for="(tag, index) of record.tags"
+          :key="index"
+          style="margin-right: 6px"
+          color="purple"
+          >{{ tag }}
+        </a-tag>
+      </template>
+      <template #createTime="{ record }">
+        {{ moment(record.createTime).format("YYYY/MM/DD HH:mm") }}
       </template>
     </a-table>
   </div>
@@ -29,14 +44,15 @@
 <script setup lang="ts">
 import { onMounted, ref, watchEffect } from "vue";
 import {
-  JudgeConfig,
   Question,
   QuestionControllerService,
+  QuestionVO,
 } from "../../../generated";
 import { Message } from "@arco-design/web-vue";
 import { useRouter } from "vue-router";
+import moment from "moment/moment";
 
-const dataList = ref([] as Question[]);
+const dataList = ref<QuestionVO[]>([]);
 const total = ref(1);
 const router = useRouter();
 const searchParms = ref({
@@ -47,7 +63,7 @@ onMounted(() => {
   loadData();
 });
 const loadData = async () => {
-  const res = await QuestionControllerService.listQuestionByPageUsingPost(
+  const res = await QuestionControllerService.listQuestionVoByPageUsingPost(
     searchParms.value
   );
   if (res.code === 0) {
@@ -63,93 +79,112 @@ const columns = [
     title: "Id",
     dataIndex: "id",
     key: "id",
+    width: 100,
+    ellipsis: true, // 让内容自动截断
   },
   {
     title: "标题",
     dataIndex: "title",
     key: "title",
+    width: 100,
+    ellipsis: true,
   },
-  {
-    title: "内容",
-    dataIndex: "content",
-    key: "content",
-  },
+  // {
+  //   title: "内容",
+  //   dataIndex: "content",
+  //   key: "content",
+  //   width: 300,
+  //   ellipsis: true,
+  //   tooltip: true,
+  // },
   {
     title: "标签",
-    dataIndex: "tags",
+    slotName: "tags",
     key: "tags",
+    width: 300,
+    ellipsis: true,
+    tooltip: true,
   },
-  {
-    title: "答案",
-    dataIndex: "answer",
-    key: "answer",
-  },
+  // {
+  //   title: "答案",
+  //   dataIndex: "answer",
+  //   key: "answer",
+  //   ellipsis: true,
+  // },
   {
     title: "提交数",
     dataIndex: "submitNum",
     key: "submitNum",
+    width: 70,
+    ellipsis: true,
   },
   {
     title: "通过数",
     dataIndex: "acceptedNum",
     key: "acceptedNum",
+    width: 70,
+    ellipsis: true,
   },
-  {
-    title: "用户ID",
-    dataIndex: "userId",
-    key: "userId",
-  },
-  {
-    title: "判题用例",
-    dataIndex: "judgeCase",
-    key: "judgeCase",
-  },
+  // {
+  //   title: "判题用例",
+  //   dataIndex: "judgeCase",
+  //   key: "judgeCase",
+  //   ellipsis: true,
+  // },
   {
     title: "时间限制",
     dataIndex: "judgeConfig.timeLimit",
     key: "timeLimit",
-    // render: (text: string, record: DataRecord) => {
-    //   return record.judgeConfig.timeLimit?.toString();
-    // },
+    width: 100,
+    ellipsis: true,
   },
   {
     title: "内存限制",
-    dataIndex: "judgeConfig",
+    dataIndex: "judgeConfig.memoryLimit",
     key: "memoryLimit",
+    width: 100,
+    ellipsis: true,
   },
   {
-    title: "堆栈限制",
-    dataIndex: "judgeConfig",
-    key: "stackLimit",
+    title: "创建用户",
+    dataIndex: "userVO.userName",
+    width: 100,
+    ellipsis: true,
+    tooltip: true,
   },
-  {
-    title: "点赞数",
-    dataIndex: "thumbNum",
-    key: "thumbNum",
-  },
-  {
-    title: "收藏数",
-    dataIndex: "favourNum",
-    key: "favourNum",
-  },
+  // {
+  //   title: "点赞数",
+  //   dataIndex: "thumbNum",
+  //   key: "thumbNum",
+  // },
+  // {
+  //   title: "收藏数",
+  //   dataIndex: "favourNum",
+  //   key: "favourNum",
+  // },
   {
     title: "创建时间",
-    dataIndex: "createTime",
-    key: "createTime",
+    slotName: "createTime",
+    width: 150,
+    ellipsis: true,
   },
-  {
-    title: "更新时间",
-    dataIndex: "updateTime",
-    key: "updateTime",
-  },
-  {
-    title: "是否删除",
-    dataIndex: "isDelete",
-    key: "isDelete",
-  },
+  // {
+  //   title: "更新时间",
+  //   dataIndex: "updateTime",
+  //   key: "updateTime",
+  //   width: 150,
+  //   ellipsis: true,
+  // },
+  // {
+  //   title: "是否删除",
+  //   dataIndex: "isDelete",
+  //   key: "isDelete",
+  //   ellipsis: true,
+  // },
   {
     title: "操作",
     slotName: "optional",
+    width: 200,
   },
 ];
 
@@ -196,7 +231,7 @@ watchEffect(() => {
 </script>
 
 <style scoped>
-#addQuestionView {
+#manageQuestionView {
   max-width: 85vw;
   margin: 0 auto;
 }

@@ -30,7 +30,11 @@
       }"
     >
       <template #tags="{ record }">
-        <a-tag v-for="(tag, index) of record.tags" :key="index"
+        <a-tag
+          v-for="(tag, index) of record.tags"
+          :key="index"
+          style="margin-right: 6px"
+          color="purple"
           >{{ tag }}
         </a-tag>
       </template>
