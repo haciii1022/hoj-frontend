@@ -42,7 +42,7 @@ export const routes: Array<RouteRecordRaw> = [
   },
   {
     path: "/",
-    name: "浏览题目",
+    name: "主页",
     component: HomeView,
   },
   {

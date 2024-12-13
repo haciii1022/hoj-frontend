@@ -123,7 +123,7 @@
               <a-popconfirm
                 content="你确认要删除吗？"
                 type="warning"
-                @ok="handleDelete(group.id as number)"
+                @ok="handleDeleteGroup(group.id as number)"
               >
                 <a-button type="text" size="mini">
                   <template #icon
@@ -148,7 +148,7 @@
               <a-popconfirm
                 content="你确认要删除吗？"
                 type="warning"
-                @ok="handleDelete(group.inputFile.id as number)"
+                @ok="handleDeleteFile(group.inputFile.id as number)"
               >
                 <a-button type="text" size="mini" class="delete-button">
                   <template #icon
@@ -173,7 +173,7 @@
               <a-popconfirm
                 content="你确认要删除吗？"
                 type="warning"
-                @ok="handleDelete(group.outputFile.id as number)"
+                @ok="handleDeleteFile(group.outputFile.id as number)"
               >
                 <a-button class="delete-button" type="text" size="mini">
                   <template #icon
@@ -324,12 +324,26 @@ const handleAdd = () => {
     output: "",
   });
 };
-const handleDelete = async (fileId: number) => {
+const handleDeleteFile = async (fileId: number) => {
   QuestionControllerService.deleteJudgeCaseFileUsingGet(fileId)
     .then((res) => {
       if (res.code === 0) {
         Message.success("删除成功");
         console.log("del_questionId: " + form.value.id);
+        loadJudgeCaseData(form.value.id);
+      } else {
+        Message.error("删除失败, " + res.message);
+      }
+    })
+    .catch((error) => {
+      Message.error("删除请求失败: " + error.message);
+    });
+};
+const handleDeleteGroup = async (groupId: number) => {
+  QuestionControllerService.deleteJudgeCaseGroupUsingGet(groupId)
+    .then((res) => {
+      if (res.code === 0) {
+        Message.success("删除成功");
         loadJudgeCaseData(form.value.id);
       } else {
         Message.error("删除失败, " + res.message);

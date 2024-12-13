@@ -92,16 +92,15 @@
       <template #memory="{ record }">
         <div
           v-if="
-            record.judgeInfo.memory != null &&
-            record.judgeInfo.memory < 1024 * 1024
+            record.judgeInfo.memory != null && record.judgeInfo.memory < 1024
           "
         >
           <!-- 默认KB为单位-->
-          {{ record.judgeInfo.memory / 1024 }} KB
+          {{ record.judgeInfo.memory }} KB
         </div>
         <div v-else-if="record.judgeInfo.memory != null">
           <!-- 超过了1024KB才会转化成MB-->
-          {{ (record.judgeInfo.memory / (1024 * 1024)).toFixed(2) }} MB
+          {{ (record.judgeInfo.memory / 1024).toFixed(2) }} MB
         </div>
       </template>
       <template #time="{ record }">
