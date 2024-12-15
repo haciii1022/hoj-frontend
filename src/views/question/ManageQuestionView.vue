@@ -7,9 +7,9 @@
       @page-change="doPageChange"
       @page-size-change="doPageSizeChange"
       :pagination="{
-        pageSize: searchParms.pageSize,
+        pageSize: searchParams.pageSize,
         pageSizeOptions: [5, 10, 15, 20],
-        current: searchParms.current,
+        current: searchParams.current,
         total: total,
         showTotal: true,
         showPageSize: true,
@@ -55,7 +55,8 @@ import moment from "moment/moment";
 const dataList = ref<QuestionVO[]>([]);
 const total = ref(1);
 const router = useRouter();
-const searchParms = ref({
+const searchParams = ref({
+  isWithRelatedData: false,
   pageSize: 5,
   current: 1,
 });
@@ -64,7 +65,7 @@ onMounted(() => {
 });
 const loadData = async () => {
   const res = await QuestionControllerService.listQuestionVoByPageUsingPost(
-    searchParms.value
+    searchParams.value
   );
   if (res.code === 0) {
     dataList.value = res.data.records;
@@ -211,19 +212,19 @@ const doUpdate = async (question: Question) => {
   });
 };
 const doPageChange = async (pageNumber: number) => {
-  searchParms.value = {
-    ...searchParms.value,
+  searchParams.value = {
+    ...searchParams.value,
     current: pageNumber,
   };
 };
 const doPageSizeChange = async (pageSize: number) => {
-  searchParms.value = {
-    ...searchParms.value,
+  searchParams.value = {
+    ...searchParams.value,
     pageSize: pageSize,
   };
 };
 /**
- * 监听searchParms变量，改变时触发loadData()
+ * 监听searchParams变量，改变时触发loadData()
  */
 watchEffect(() => {
   loadData();

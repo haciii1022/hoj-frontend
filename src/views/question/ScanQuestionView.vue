@@ -85,46 +85,50 @@
                 >
                   <template #info="{ record }">
                     <a-tag
-                      v-if="record.judgeInfo?.message == 'Accepted'"
+                      v-if="record.judgeInfoList[0]?.message == 'Accepted'"
                       color="green"
                     >
-                      {{ record.judgeInfo.message }}
+                      {{ record.judgeInfoList[0].message }}
                     </a-tag>
                     <a-tag
-                      v-else-if="record.judgeInfo?.message == 'Compile Error'"
+                      v-else-if="
+                        record.judgeInfoList[0]?.message == 'Compile Error'
+                      "
                       color="orange"
                     >
-                      {{ record.judgeInfo.message }}
+                      {{ record.judgeInfoList[0].message }}
                     </a-tag>
                     <a-tag
-                      v-else-if="record.judgeInfo?.message == 'System Error'"
+                      v-else-if="
+                        record.judgeInfoList[0]?.message == 'System Error'
+                      "
                       color="blue"
                     >
-                      {{ record.judgeInfo.message }}
+                      {{ record.judgeInfoList[0].message }}
                     </a-tag>
                     <a-tag v-else color="red">
-                      {{ record.judgeInfo?.message }}
+                      {{ record.judgeInfoList[0]?.message }}
                     </a-tag>
                   </template>
                   <template #memory="{ record }">
                     <div
                       v-if="
-                        record.judgeInfo?.memory != null &&
-                        record.judgeInfo?.memory < 1024
+                        record.judgeInfoList[0]?.memory != null &&
+                        record.judgeInfoList[0]?.memory < 1024
                       "
                     >
                       <!-- 默认KB为单位-->
-                      {{ record.judgeInfo!!.memory }} KB
+                      {{ record.judgeInfoList[0]!!.memory }} KB
                     </div>
-                    <div v-else-if="record.judgeInfo?.memory != null">
+                    <div v-else-if="record.judgeInfoList[0]?.memory != null">
                       <!-- 超过了1024KB才会转化成MB-->
-                      {{ (record.judgeInfo.memory / 1024).toFixed(2) }}
+                      {{ (record.judgeInfoList[0].memory / 1024).toFixed(2) }}
                       MB
                     </div>
                   </template>
                   <template #time="{ record }">
-                    <div v-if="record.judgeInfo?.time != null">
-                      {{ record.judgeInfo.time }} ms
+                    <div v-if="record.judgeInfoList[0]?.time != null">
+                      {{ record.judgeInfoList[0].time }} ms
                     </div>
                   </template>
                 </a-table>
@@ -147,7 +151,6 @@ import {
 import { Message } from "@arco-design/web-vue";
 import CodeEditor from "@/components/CodeEditor.vue";
 import MdViewer from "@/components/MdViewer.vue";
-import MdEditor from "@/components/MdEditor.vue";
 
 interface Props {
   id: number;
@@ -213,12 +216,11 @@ const getSubmitStatus = async (id: number) => {
   try {
     let submitVO;
     do {
-      const res = await QuestionControllerService.getQuestionSubmitByIdUsingGet(
-        id
-      );
+      const res =
+        await QuestionControllerService.getQuestionSubmitVoByIdUsingGet(id);
       submitVO = res.data as QuestionSubmitVO;
       if (submitVO == null || submitVO.status === 0 || submitVO.status === 1) {
-        await new Promise((resolve) => setTimeout(resolve, 1000)); // 等待300毫秒
+        await new Promise((resolve) => setTimeout(resolve, 2000)); // 等待300毫秒
       }
     } while (
       submitVO == null ||
@@ -227,6 +229,7 @@ const getSubmitStatus = async (id: number) => {
     );
     loading.value = false;
     questionSubmitVO.value[0] = submitVO;
+    console.log("submitVO: " + JSON.stringify(submitVO));
   } catch (error) {
     console.error("Failed to get submit status:", error);
     // 处理错误，例如重试或者通知用户

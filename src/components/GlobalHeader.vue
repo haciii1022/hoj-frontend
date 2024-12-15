@@ -5,6 +5,7 @@
         mode="horizontal"
         :selected-keys="selectedKeys"
         @menu-item-click="doMenuClick"
+        style="line-height: 4vh !important"
       >
         <a-menu-item
           key="0"
@@ -141,20 +142,23 @@ router.afterEach((to, from, failure) => {
 
 <style scoped>
 #globalHeader {
-  height: 10vh;
+  height: 9.5vh;
+  color: white;
+  overflow: hidden; /* 隐藏超出部分 */
 }
 
 .title-bar {
+  cursor: default; /* 确保鼠标样式为普通箭头 */
   display: flex;
   align-items: center;
 }
 
 .logo {
+  max-width: 100%; /* 确保图片不会超出父级 */
   height: 48px;
 }
 
 .title {
-  color: #2137ff;
   margin-left: 16px;
 }
 </style>

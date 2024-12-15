@@ -23,11 +23,19 @@ import GlobalHeader from "@/components/GlobalHeader.vue";
 }
 
 #basicLayout .header {
-  box-shadow: #bcfff8 1px 1px 10px;
+  position: fixed; /* 固定顶部 */
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 9.5vh; /* 固定高度 */
+  background: white;
+  z-index: 1000; /* 确保在页面内容上方 */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* 增加阴影效果 */
 }
 
 #basicLayout .content {
-  background: linear-gradient(to right, #efefef, #fff);
+  margin-top: 10vh; /* 与 Header 高度一致 */
+  background: #ededed;
   height: 90vh;
   padding: 10px;
   margin-bottom: 8px;

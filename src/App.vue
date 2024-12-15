@@ -19,6 +19,7 @@ import { onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { debounce } from "lodash";
 import store from "@/store";
+
 const route = useRoute();
 
 const doInit = () => {
@@ -42,8 +43,10 @@ const _ = (window as any).ResizeObserver;
 </script>
 <style>
 #app {
+  background: #ededed;
   height: 100vh;
 }
+
 body {
   user-select: none; /* 禁止文字选中 */
 }

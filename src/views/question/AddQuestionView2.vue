@@ -198,6 +198,7 @@ import {
 } from "../../../generated";
 import { Message } from "@arco-design/web-vue";
 import { useRoute, useRouter } from "vue-router";
+
 const fileUrl = "/api/question/judgeCaseFile/download?fileId=";
 let form = ref({
   id: "0",
@@ -258,7 +259,7 @@ const loadData = async () => {
   if (!id) {
     const res = await QuestionControllerService.getNextQuestionIdUsingGet();
     if (res.code === 0) {
-      form.value.id = res.data;
+      form.value.id = String(res.data);
       console.log("id " + JSON.stringify(form.value));
     } else {
       Message.error("生成题目ID失败");
@@ -390,7 +391,13 @@ const handleFileUpload = async (event: Event) => {
     type: type,
   };
   const jsonData = JSON.stringify(data);
-
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("jsonData", jsonData);
+  if (!file) {
+    console.error("File is not selected!");
+    return;
+  }
   try {
     const res = await QuestionControllerService.addJudgeCaseFileUsingPost(
       file,

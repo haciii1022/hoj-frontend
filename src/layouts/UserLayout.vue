@@ -31,6 +31,7 @@
 }
 
 #userLayout .header {
+  background-color: white;
   box-shadow: #bcfff8 1px 1px 10px;
 }
 

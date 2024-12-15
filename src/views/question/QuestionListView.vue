@@ -1,13 +1,16 @@
 <template>
   <div id="questionListView">
     <h2>题目列表</h2>
-    <a-form :model="searchParms" layout="inline" style="min-width: 240px">
+    <a-form :model="searchParams" layout="inline" style="min-width: 240px">
       <a-form-item field="title" label="名称">
-        <a-input v-model="searchParms.title" placeholder="请输入名称"></a-input>
+        <a-input
+          v-model="searchParams.title"
+          placeholder="请输入名称"
+        ></a-input>
       </a-form-item>
       <a-form-item field="tag" label="标签" style="min-width: 240px">
         <a-input-tag
-          v-model="searchParms.tags"
+          v-model="searchParams.tags"
           placeholder="请输入标签"
         ></a-input-tag>
       </a-form-item>
@@ -20,9 +23,9 @@
       @page-change="doPageChange"
       @page-size-change="doPageSizeChange"
       :pagination="{
-        pageSize: searchParms.pageSize,
+        pageSize: searchParams.pageSize,
         pageSizeOptions: [5, 10, 15, 20],
-        current: searchParms.current,
+        current: searchParams.current,
         total: total,
         showTotal: true,
         showPageSize: true,
@@ -73,9 +76,10 @@ import moment from "moment";
 const dataList = ref([] as QuestionVO[]);
 const total = ref(1);
 const router = useRouter();
-const searchParms = ref<QuestionQueryRequest>({
+const searchParams = ref<QuestionQueryRequest>({
   title: "",
   tags: [],
+  isWithRelatedData: true,
   pageSize: 5,
   current: 1,
 });
@@ -84,11 +88,12 @@ onMounted(() => {
 });
 const loadData = async () => {
   const res = await QuestionControllerService.listQuestionVoByPageUsingPost(
-    searchParms.value
+    searchParams.value
   );
   if (res.code === 0) {
     dataList.value = res.data.records;
     total.value = res.data.total;
+    console.log("dataList.value: " + JSON.stringify(dataList.value));
   } else {
     Message.error("获取题目列表失败, " + res.message);
   }
@@ -132,26 +137,26 @@ const doQuestionPage = async (question: QuestionVO) => {
   });
 };
 const doSearch = async () => {
-  searchParms.value = {
-    ...searchParms.value,
+  searchParams.value = {
+    ...searchParams.value,
     current: 1,
   };
   // await loadData();
 };
 const doPageChange = async (pageNumber: number) => {
-  searchParms.value = {
-    ...searchParms.value,
+  searchParams.value = {
+    ...searchParams.value,
     current: pageNumber,
   };
 };
 const doPageSizeChange = async (pageSize: number) => {
-  searchParms.value = {
-    ...searchParms.value,
+  searchParams.value = {
+    ...searchParams.value,
     pageSize: pageSize,
   };
 };
 /**
- * 监听searchParms变量，改变时触发loadData()
+ * 监听searchParams变量，改变时触发loadData()
  */
 watchEffect(() => {
   loadData();
