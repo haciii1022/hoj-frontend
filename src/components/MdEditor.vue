@@ -19,6 +19,7 @@ import zhHans from "bytemd/locales/zh_Hans.json";
 import "katex/dist/katex.css";
 import "highlight.js/styles/atom-one-dark.min.css";
 import "bytemd/dist/index.css";
+import { codeCopyPlugin } from "@/plugin/AddCopyButtonPlugin";
 // import "highlight.js/styles/vs.css";
 // import "@bytemd/plugin-math/locales/zh_Hans.json";
 // import "bytemd/locales/zh_Hans.json";
@@ -32,7 +33,7 @@ interface Props {
 }
 
 // 初始化插件数组
-const plugins = [gfm(), highlight(), math()];
+const plugins = [gfm(), highlight(), math(), codeCopyPlugin()];
 
 /**
  * 给组件指定初始值

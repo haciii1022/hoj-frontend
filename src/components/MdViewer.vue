@@ -12,9 +12,11 @@ import { Viewer } from "@bytemd/vue-next";
 import "katex/dist/katex.css";
 import "juejin-markdown-themes/dist/juejin.min.css";
 import "bytemd/dist/index.css";
+import "highlight.js/styles/default.css";
 // import "highlight.js/styles/vs.css";
 // import "@bytemd/plugin-math/locales/zh_Hans.json";
 import "bytemd/locales/zh_Hans.json";
+import { codeCopyPlugin } from "@/plugin/AddCopyButtonPlugin";
 
 /**
  * 定义组件属性类型
@@ -24,8 +26,15 @@ interface Props {
 }
 
 // 初始化插件数组
-const plugins = [math(), gfm(), highlight()];
-
+const plugins = [math(), gfm(), highlight(), codeCopyPlugin()];
+// copyCode({
+//   copySuccess: (text) => {
+//     console.log("复制成功: " + text);
+//   },
+//   // eslint-disable-next-line @typescript-eslint/no-empty-function
+//   copyError: (err) => {},
+//   copyRight: "",
+// }),
 /**
  * 给组件指定初始值
  */
