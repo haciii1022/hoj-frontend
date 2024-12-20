@@ -515,6 +515,7 @@ const doSubmit = async () => {
 :deep(.bytemd) {
   height: 550px;
   border-radius: 8px;
+  overflow: hidden;
 }
 
 .file-row {

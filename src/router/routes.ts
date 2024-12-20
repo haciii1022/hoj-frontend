@@ -13,6 +13,7 @@ import ScanQuestionView from "@/views/question/ScanQuestionView.vue";
 import QuestionSubmitView from "@/views/question/QuestionSubmitListView.vue";
 import AddQuestionView2 from "@/views/question/AddQuestionView2.vue";
 import UserInfoView from "@/views/user/UserInfoView.vue";
+import QuestionSubmitDetailView from "@/views/question/QuestionSubmitDetailView.vue";
 
 export const routes: Array<RouteRecordRaw> = [
   {
@@ -94,9 +95,18 @@ export const routes: Array<RouteRecordRaw> = [
     },
   },
   {
-    path: "/question_submit/list",
+    path: "/record/list",
     name: "提交记录",
     component: QuestionSubmitView,
+  },
+  {
+    path: "/record/detail/:id",
+    name: "判题详情",
+    props: true,
+    component: QuestionSubmitDetailView,
+    meta: {
+      hideInMenu: true,
+    },
   },
   {
     path: "/noAuth",
