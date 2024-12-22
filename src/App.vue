@@ -46,8 +46,10 @@ const _ = (window as any).ResizeObserver;
   background: #ededed;
   height: 100vh;
 }
-
 body {
   user-select: none; /* 禁止文字选中 */
+}
+.arco-btn-text:hover {
+  background-color: transparent !important; /* 禁止悬停背景色 */
 }
 </style>

@@ -6,7 +6,7 @@
           <div style="padding-top: 15px; font-size: 20px">
             <div
               v-if="form?.score == 100"
-              style="color: #1bef1b; margin-bottom: 10px"
+              style="color: #17c617; margin-bottom: 10px"
             >
               <icon-check />
               {{ form?.score }} {{ mainInfo?.message }}
@@ -38,7 +38,7 @@
             <div style="display: flex">
               <div
                 v-if="record.message == 'Accepted'"
-                style="color: #1bef1b; margin-right: 10px"
+                style="color: #17c617; margin-right: 10px"
               >
                 <icon-check />
                 {{ record.message }}
@@ -53,7 +53,7 @@
             </div>
           </template>
           <template #score="{ record }">
-            <div v-if="record.message == 'Accepted'" style="color: #1bef1b">
+            <div v-if="record.message == 'Accepted'" style="color: #17c617">
               {{ record.score }}
             </div>
             <div v-else style="color: red">
@@ -109,7 +109,7 @@
           </a-col>
           <a-col flex="auto" class="custom-col">
             <a :href="`/question/list/${form.questionId}`" class="custom-link">
-              {{ form.questionId }} {{ form.questionVO?.title }}
+              {{ form.questionId }}&nbsp;&nbsp;{{ form.questionVO?.title }}
             </a>
           </a-col>
         </a-row>
@@ -118,7 +118,7 @@
             <div>语言</div>
           </a-col>
           <a-col flex="auto" class="custom-col">
-            <div>{{ form.language }}</div>
+            <div>{{ formatLanguage(form?.language || "") }}</div>
           </a-col>
         </a-row>
         <a-row class="custom-row">
@@ -170,7 +170,14 @@
             <div>峰值内存</div>
           </a-col>
           <a-col flex="auto" class="custom-col">
-            <div>{{ mainInfo?.memory }} KiB</div>
+            <div v-if="mainInfo?.memory != null && mainInfo?.memory < 1024">
+              <!-- 默认KB为单位-->
+              {{ mainInfo?.memory }} KiB
+            </div>
+            <div v-else-if="mainInfo?.memory != null">
+              <!-- 超过了1024KB才会转化成MB-->
+              {{ (mainInfo?.memory / 1024).toFixed(2) }} MiB
+            </div>
           </a-col>
         </a-row>
       </div>
@@ -186,14 +193,19 @@ import {
   QuestionSubmitVO,
 } from "../../../generated";
 import { TableColumnData } from "@arco-design/web-vue";
-import CodeEditor from "@/components/CodeEditor.vue";
 import CodeViewer from "@/components/CodeViewer.vue";
-import MdEditor from "@/components/MdEditor.vue";
 
 const form = ref<QuestionSubmitVO>({});
 const mainInfo = ref<JudgeInfo>();
 const subInfoList = ref<JudgeInfo[]>();
 const codeByteLength = ref(0);
+const languageMap: Record<string, string> = {
+  cpp: "C++",
+  java: "Java",
+  python: "Python",
+  golang: "Golang",
+  // 添加其他语言
+};
 const columns = [
   {
     title: "序号", // 新添加的列标题
@@ -203,7 +215,7 @@ const columns = [
     },
     width: 50,
     bodyCellStyle: (record: JudgeInfo) => {
-      const borderColor = record.message === "Accepted" ? "#1bef1b" : "red";
+      const borderColor = record.message === "Accepted" ? "#17c617" : "red";
       return {
         borderLeft: `2px solid ${borderColor}`,
       };
@@ -247,7 +259,9 @@ const calculateBytes = (str: string) => {
   const encoded = encoder.encode(str);
   return encoded.length;
 };
-
+const formatLanguage = (lang: string) => {
+  return languageMap[lang] || lang;
+};
 const loadData = async () => {
   const res =
     await QuestionControllerService.getQuestionSubmitDetailByIdUsingGet(
@@ -291,6 +305,7 @@ onMounted(() => {
 :deep(.arco-table-th) {
   position: relative;
   height: 50px;
+  border-bottom: 1px solid rgb(var(--gray-3));
   background-color: white;
 }
 
@@ -345,12 +360,14 @@ onMounted(() => {
   margin-top: 20px;
   background-color: white;
 }
+
 .side-title {
   font-size: 24px; /* 字体大小 */
   color: #666666; /* 灰色字体 */
   margin-bottom: 15px; /* 下边距 */
   text-align: left; /* 文字左对齐 */
 }
+
 .side-content {
   border-radius: 16px; /* 边框弧度 */
   padding: 16px 16px;
@@ -404,6 +421,7 @@ onMounted(() => {
 }
 
 .custom-link:hover {
+  text-decoration: underline; /* 鼠标悬停时显示下划线 */
   color: rgb(var(--red-5)); /* 悬停颜色 */
 }
 

@@ -48,7 +48,7 @@ export const routes: Array<RouteRecordRaw> = [
   },
   {
     path: "/question/list",
-    name: "题目列表",
+    name: "题库",
     component: QuestionListView,
   },
   {
@@ -66,12 +66,13 @@ export const routes: Array<RouteRecordRaw> = [
     name: "新增题目",
     component: AddQuestionView,
     meta: {
+      hideInMenu: true,
       access: ACCESS_ENUM.ADMIN,
     },
   },
   {
     path: "/question/add2",
-    name: "新增题目2",
+    name: "新增题目",
     component: AddQuestionView2,
     meta: {
       access: ACCESS_ENUM.ADMIN,

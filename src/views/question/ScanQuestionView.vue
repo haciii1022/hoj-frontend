@@ -4,21 +4,27 @@
       <a-col :span="12" class="custom-scroll">
         <a-tabs default-active-key="question">
           <a-tab-pane key="question" title="题目">
-            <a-card v-if="question" :title="question.title">
+            <a-card v-if="question">
+              <template #title>
+                {{ question.title }}
+                <span v-if="question.isHidden" style="color: lightgray"
+                  >(隐藏)</span
+                >
+              </template>
               <div>
                 <a-descriptions
                   title="判题条件"
                   :column="{ xs: 1, md: 2, lg: 3 }"
                 >
                   <a-descriptions-item label="时间限制">
-                    {{ question.judgeConfig?.timeLimit ?? 0 }} MS
+                    {{ question.judgeConfig?.timeLimit ?? 0 }} ms
                   </a-descriptions-item>
                   <a-descriptions-item label="空间限制">
-                    {{ question.judgeConfig?.memoryLimit ?? 0 }} KB
+                    {{ question.judgeConfig?.memoryLimit ?? 0 }} KiB
                   </a-descriptions-item>
-                  <a-descriptions-item label="堆栈限制">
-                    {{ question.judgeConfig?.stackLimit ?? 0 }}
-                  </a-descriptions-item>
+                  <!--                  <a-descriptions-item label="堆栈限制">-->
+                  <!--                    {{ question.judgeConfig?.stackLimit ?? 0 }}-->
+                  <!--                  </a-descriptions-item>-->
                 </a-descriptions>
               </div>
               <MdViewer :value="question.content ?? ''" />
@@ -48,13 +54,23 @@
               label="编程语言"
               style="min-width: 240px"
             >
-              <a-select v-model="form.language" placeholder="选择编程语言">
-                <a-option>java</a-option>
-                <a-option>python</a-option>
-                <a-option>cpp</a-option>
-                <a-option>go</a-option>
+              <a-select
+                v-model="form.language"
+                placeholder="选择编程语言"
+                style="border: 1px solid var(--color-neutral-4); width: 150px"
+              >
+                <a-option label="Java" value="java" />
+                <a-option label="Python" value="python" />
+                <a-option label="C++" value="cpp" />
+                <a-option label="Golang" value="go" />
               </a-select>
             </a-form-item>
+            <a-tooltip
+              content="请通过代码实现题目，过程中的输入输出处理方式请参考题目输入输出描述"
+              position="tr"
+            >
+              <a-form-item label="ACM模式" />
+            </a-tooltip>
           </a-form>
           <CodeEditor
             :value="form.code"
