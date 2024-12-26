@@ -158,7 +158,10 @@ const handleFileChange = (event: Event) => {
 const handleSubmit = async () => {
   const res = await UserControllerService.updateMyUserUsingPost(form.value);
   if (res.code === 0) {
-    Message.success("保存成功");
+    Message.success({
+      content: "保存成功",
+      duration: 1000, // 设置显示时间为 1 秒
+    });
     setTimeout(() => {
       router.push({
         path: "/",

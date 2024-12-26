@@ -1,6 +1,5 @@
 import { RouteRecordRaw } from "vue-router";
 import HomeView from "@/views/HomeView.vue";
-import AdminView from "@/views/AdminView.vue";
 import NoAuthView from "@/views/NoAuthView.vue";
 import ACCESS_ENUM from "@/access/accessEnum";
 import UserLayout from "@/layouts/UserLayout.vue";
@@ -71,7 +70,7 @@ export const routes: Array<RouteRecordRaw> = [
     },
   },
   {
-    path: "/question/add2",
+    path: "/question/add",
     name: "新增题目",
     component: AddQuestionView2,
     meta: {

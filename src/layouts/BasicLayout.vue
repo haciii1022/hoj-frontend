@@ -7,9 +7,6 @@
       <a-layout-content class="content">
         <router-view />
       </a-layout-content>
-      <!--      <a-layout-footer class="footer">-->
-      <!--        <a href="https://haciii1022.github.io/">知识星球 By Mirror</a>-->
-      <!--      </a-layout-footer>-->
     </a-layout>
   </div>
 </template>
@@ -37,7 +34,7 @@ import GlobalHeader from "@/components/GlobalHeader.vue";
   margin-top: 10vh; /* 与 Header 高度一致 */
   background: #ededed;
   height: 90vh;
-  padding: 10px;
+  padding: 0 10px;
   margin-bottom: 8px;
 }
 

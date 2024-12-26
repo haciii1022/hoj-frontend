@@ -88,6 +88,7 @@
           <a :href="`/question/list/${record.id}`" class="custom-link">
             {{ record.id }}&nbsp;&nbsp;{{ record.title }}
           </a>
+          <span v-if="record.isHidden" style="color: lightgray">(隐藏)</span>
         </template>
         <template #tags="{ record }">
           <a-tag

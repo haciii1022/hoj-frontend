@@ -65,7 +65,6 @@ export const codeCopyPlugin = (): BytemdPlugin => {
     viewerEffect: ({ markdownBody }) => {
       // 获取所有 code 标签
       const els = markdownBody.querySelectorAll("pre > code");
-      console.log("els.length: " + els.length);
       if (els.length === 0) return;
 
       // 为每个 pre 元素添加按钮

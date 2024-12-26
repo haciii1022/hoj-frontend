@@ -288,6 +288,7 @@ onMounted(() => {
 <style scoped>
 #questionSubmitDetailView {
   display: flex;
+  align-items: flex-start; /* 子元素高度由内容决定 */
   width: 90vw;
   margin: 0 auto;
 }
@@ -373,7 +374,7 @@ onMounted(() => {
   padding: 16px 16px;
   width: 19%;
   margin: 20px 5% 10px 0;
-  height: 350px;
+  height: auto;
   background-color: white;
 }
 
