@@ -341,7 +341,6 @@ onMounted(() => {
   margin: 20px 5% 10px 5%;
   height: auto;
   border-radius: 10px; /* 边框弧度 */
-  overflow: hidden;
 }
 
 .main-content1 {
@@ -350,6 +349,7 @@ onMounted(() => {
   border-radius: 10px; /* 边框弧度 */
   overflow: hidden;
   background-color: white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* 阴影 */
 }
 
 .main-content2 {
@@ -360,6 +360,7 @@ onMounted(() => {
   padding-top: 15px;
   margin-top: 20px;
   background-color: white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* 阴影 */
 }
 
 .side-title {
@@ -376,6 +377,7 @@ onMounted(() => {
   margin: 20px 5% 10px 0;
   height: auto;
   background-color: white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* 阴影 */
 }
 
 :deep(tr.arco-table-tr) {

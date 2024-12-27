@@ -2,15 +2,24 @@
   <div id="addQuestionView">
     <div class="main-content">
       <a-form :model="form" label-align="left" layout="vertical" ref="formRef">
-        <a-row :gutter="40">
+        <a-row :gutter="20">
           <a-col :span="6">
             <a-form-item
               field="id"
               label="题目ID"
               required
-              style="user-select: none"
+              style="user-select: none; user-focus: none"
             >
-              <a-input v-model="form.id" placeholder="P1000" disabled />
+              <a-input
+                v-model="form.id"
+                placeholder="P1000"
+                disabled
+                style="
+                  pointer-events: none;
+                  background-color: white;
+                  border: 1px solid var(--color-neutral-4);
+                "
+              />
             </a-form-item>
           </a-col>
           <a-col :span="12">
@@ -24,6 +33,10 @@
                 v-model="form.title"
                 placeholder="请输入标题"
                 allow-clear
+                style="
+                  background-color: white;
+                  border: 1px solid var(--color-neutral-4);
+                "
               />
             </a-form-item>
           </a-col>
@@ -39,16 +52,24 @@
         </a-row>
         <a-row :gutter="20">
           <a-col :span="18">
-            <a-form-item field="data.tags" tooltip="请输入标签" label="标签">
+            <a-form-item
+              field="data.tags"
+              tooltip="请输入标签，按回车分割"
+              label="标签"
+            >
               <a-input-tag
                 v-model="form.tags"
                 placeholder="请输入标签"
                 allow-clear
+                style="
+                  background-color: white;
+                  border: 1px solid var(--color-neutral-4);
+                "
               />
             </a-form-item>
           </a-col>
         </a-row>
-        <a-row :gutter="40">
+        <a-row :gutter="20">
           <a-col :span="6">
             <a-form-item
               field="judgeConfig.timeLimit"
@@ -60,8 +81,13 @@
                 v-model="form.judgeConfig.timeLimit"
                 placeholder="请输入"
                 :min="0"
+                :hide-button="true"
+                style="
+                  background-color: white;
+                  border: 1px solid var(--color-neutral-4);
+                "
               >
-                <template #append> ms</template>
+                <template #suffix> ms</template>
               </a-input-number>
             </a-form-item>
           </a-col>
@@ -75,8 +101,13 @@
                 v-model="form.judgeConfig.memoryLimit"
                 placeholder="请输入"
                 :min="0"
+                :hide-button="true"
+                style="
+                  background-color: white;
+                  border: 1px solid var(--color-neutral-4);
+                "
               >
-                <template #append> KiB</template>
+                <template #suffix> KiB</template>
               </a-input-number>
             </a-form-item>
           </a-col>
@@ -91,7 +122,7 @@
             </div>
           </a-col>
         </a-row>
-        <a-row :gutter="40" style="margin-top: 20px">
+        <a-row :gutter="20" style="margin-top: 20px">
           <a-col :span="4">
             <a-button
               class="custom-button"
@@ -130,10 +161,10 @@
           </a-row>
           <a-row class="custom-row">
             <a-col flex="100px" class="custom-col">
-              <div>通过数</div>
+              <div>AC数</div>
             </a-col>
             <a-col flex="auto" class="custom-col">
-              <div></div>
+              <div>{{ form.acceptedNum }}</div>
             </a-col>
           </a-row>
           <a-row class="custom-row">
@@ -141,15 +172,22 @@
               <div>提交数</div>
             </a-col>
             <a-col flex="auto" class="custom-col">
-              <div></div>
+              <div>{{ form.submitNum }}</div>
             </a-col>
           </a-row>
+          <ScoreDistributionChart />
         </div>
       </div>
-      <a-spin :loading="isLoading">
-        <a-card title="判题数据" class="upload-file" :bordered="false">
+      <a-spin :loading="isLoading" class="upload-file" id="main-card">
+        <a-card :bordered="false" id="main-card2">
+          <template #title>
+            <div>判题数据 (共{{ judgeCaseGroupList.length }}组)</div>
+          </template>
           <template #extra>
-            <a-button type="text" @click="addJudgeCaseGroup"
+            <a-button
+              type="text"
+              @click="addJudgeCaseGroup"
+              style="padding-right: 10px"
               >新增数据组
             </a-button>
           </template>
@@ -176,6 +214,7 @@
                     <a-button
                       type="text"
                       @click="triggerFileInputClick(group.id as number)"
+                      style="padding: 0"
                     >
                       <icon-upload />
                       上传文件
@@ -263,6 +302,7 @@ import {
 } from "../../../generated";
 import { Message } from "@arco-design/web-vue";
 import { useRoute, useRouter } from "vue-router";
+import ScoreDistributionChart from "@/components/ScoreDistributionChart.vue";
 
 const fileUrl = "/api/question/judgeCaseFile/download?fileId=";
 const isHidden = ref<boolean>(false);
@@ -312,6 +352,8 @@ const form = ref({
     },
   ],
   userId: -1,
+  acceptedNum: 0,
+  submitNum: 0,
 });
 const uploadUser = ref<UserVO>();
 let judgeCaseGroupList = ref([] as JudgeCaseGroupVO[]);
@@ -570,23 +612,26 @@ const doSubmit = async () => {
 <style scoped>
 #addQuestionView {
   display: flex;
+  justify-content: center;
   align-items: flex-start; /* 子元素高度由内容决定 */
   width: 1500px;
   margin: 0 auto;
 }
 
 .main-content {
-  width: 60%;
-  margin: 20px 5% 10px 15%;
+  width: 55%;
+  margin-top: 20px;
+  margin-right: 3%;
   height: auto;
   border-radius: 16px; /* 边框弧度 */
-  padding: 30px;
-  background-color: #d3d3d3;
+  padding: 20px 20px;
+  background-color: white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* 阴影 */
 }
 
 .side-content {
-  width: 17%;
-  margin: 20px 50px 10px 0;
+  width: 18%;
+  margin-top: 20px;
   height: auto;
   display: flex;
   align-items: flex-start; /* 子元素高度由内容决定 */
@@ -597,14 +642,15 @@ const doSubmit = async () => {
   border-radius: 16px; /* 边框弧度 */
   width: 100%;
   height: auto;
-  padding: 14px 14px;
+  padding: 20px 14px 14px 14px;
   margin-bottom: 40px;
-  background-color: #f6f5f5;
+  background-color: white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* 阴影 */
 }
 
 .scroll-container {
   width: 100%;
-  max-height: 400px; /* 限制滚动容器的高度 */
+  max-height: 325px; /* 限制滚动容器的高度 */
   overflow-y: auto; /* 只允许垂直滚动 */
   overflow-x: hidden; /* 禁止水平滚动（可根据需要调整） */
   padding-right: 8px; /* 避免滚动条覆盖内容 */
@@ -630,10 +676,11 @@ const doSubmit = async () => {
   height: auto;
   padding: 5px 15px 20px;
   margin-bottom: 10px;
-  background-color: #f6f5f5;
+  background-color: white;
   overflow: hidden; /* 避免其他滚动条干扰 */
   display: flex;
   flex-direction: column;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* 阴影 */
 }
 
 :deep(.bytemd) {
@@ -679,5 +726,13 @@ const doSubmit = async () => {
 :deep(.arco-avatar-circle) {
   width: 25px;
   height: 25px;
+}
+
+:deep(#main-card .arco-card-size-medium .arco-card-header) {
+  padding: 8px 0;
+}
+
+:deep(#main-card2 .arco-card-size-medium .arco-card-header) {
+  padding: 8px 10px;
 }
 </style>

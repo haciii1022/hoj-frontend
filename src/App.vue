@@ -45,6 +45,7 @@ const _ = (window as any).ResizeObserver;
 #app {
   background: #ededed;
   height: 100vh;
+  overflow-x: hidden;
 }
 body {
   user-select: none; /* 禁止文字选中 */

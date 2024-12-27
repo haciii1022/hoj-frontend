@@ -261,6 +261,7 @@ watchEffect(() => {
   border-radius: 16px; /* 边框弧度 */
   overflow: hidden;
   background-color: white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* 阴影 */
 }
 
 .search-content {
@@ -273,6 +274,7 @@ watchEffect(() => {
   overflow: hidden;
   background-color: white;
   margin-bottom: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* 阴影 */
 }
 
 .custom-button {
