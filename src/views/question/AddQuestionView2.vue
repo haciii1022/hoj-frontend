@@ -175,7 +175,7 @@
               <div>{{ form.submitNum }}</div>
             </a-col>
           </a-row>
-          <ScoreDistributionChart />
+          <ScoreDistributionChart :question-id="Number(form.id)" />
         </div>
       </div>
       <a-spin :loading="isLoading" class="upload-file" id="main-card">

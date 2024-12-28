@@ -34,7 +34,7 @@ import "bytemd/dist/index.css";
  */
 interface Props {
   value: string;
-  mode: string;
+  mode?: string;
   handleChange: (v: string) => void;
 }
 

@@ -6,19 +6,25 @@
       <div class="summary">
         <div>
           <span class="label">常用语言：</span>
-          <span class="value">C++</span>
+          <span class="value">{{
+            formatLanguage(data.mostUsedLanguage || "")
+          }}</span>
         </div>
         <div>
           <span class="label">最大分段：</span>
-          <span class="value">81-100分 (30%)</span>
+          <span class="value"
+            >{{ data.maxSegment }} ({{ maxPercentage }}%)</span
+          >
         </div>
         <div>
           <span class="label">最小分段：</span>
-          <span class="value">0-20分 (10%)</span>
+          <span class="value"
+            >{{ data.minSegment }} ({{ minPercentage }}%)</span
+          >
         </div>
         <div>
           <span class="label">平均分：</span>
-          <span class="value">55.3</span>
+          <span class="value">{{ data.averageScore }}</span>
         </div>
       </div>
       <!-- 图表容器 -->
@@ -27,56 +33,148 @@
   </a-card>
 </template>
 
-<script lang="ts">
-import { defineComponent, onMounted, ref } from "vue";
+<script setup lang="ts">
+import {
+  ref,
+  onMounted,
+  watch,
+  computed,
+  withDefaults,
+  defineProps,
+} from "vue";
 import * as echarts from "echarts";
+import { QuestionControllerService } from "../../generated";
 
-export default defineComponent({
-  name: "ScoreDistributionCard",
-  setup() {
-    const chart = ref<HTMLDivElement | null>(null);
+// 定义 Props
+interface Props {
+  questionId: number;
+}
 
-    const scoreDistribution = [
-      { value: 40, name: "0-20分", itemStyle: { color: "red" } }, // 亮红色
-      { value: 60, name: "21-40分", itemStyle: { color: "#fbae6e" } }, // 亮橙色
-      { value: 80, name: "41-60分", itemStyle: { color: "yellow" } }, // 亮黄色
-      { value: 100, name: "61-80分", itemStyle: { color: "#A3E27E" } }, // 明亮的浅绿色
-      { value: 120, name: "81-100分", itemStyle: { color: "#17C617" } }, // 明亮绿色
-    ];
-
-    const initChart = () => {
-      if (!chart.value) return;
-
-      const myChart = echarts.init(chart.value);
-      const option = {
-        tooltip: { trigger: "item", formatter: "{b}: {c} ({d}%)" },
-        series: [
-          {
-            type: "pie",
-            radius: ["0%", "70%"], // 设置内外半径，外半径设置为70%，让饼图更大
-            center: ["50%", "50%"], // 让饼图略微向下偏移，视觉更居中
-            data: scoreDistribution,
-            label: { show: false }, // 隐藏标签
-            emphasis: {
-              itemStyle: {
-                shadowBlur: 10,
-                shadowOffsetX: 0,
-                shadowColor: "rgba(0, 0, 0, 0.5)",
-              },
-            },
-          },
-        ],
-      };
-      myChart.setOption(option);
-    };
-
-    onMounted(() => {
-      initChart();
-    });
-
-    return { chart };
-  },
+const props = withDefaults(defineProps<Props>(), {
+  questionId: 0,
 });
+
+// 定义类型
+type BackendData = {
+  scoreDistribution: Record<string, number>;
+  maxSegment: string;
+  minSegment: string;
+  averageScore: number;
+  mostUsedLanguage: string;
+};
+
+// 后端数据
+const backendData = ref<BackendData>({
+  scoreDistribution: {},
+  maxSegment: "",
+  minSegment: "",
+  averageScore: 0,
+  mostUsedLanguage: "",
+});
+const languageMap: Record<string, string> = {
+  cpp: "C++",
+  java: "Java",
+  python: "Python",
+  golang: "Golang",
+  // 添加其他语言
+};
+const formatLanguage = (lang: string) => {
+  return languageMap[lang] || lang;
+};
+// 计算图表数据
+const chartData = computed(() =>
+  Object.entries(backendData.value.scoreDistribution).map(([name, value]) => {
+    let color = "#FF6B6B"; // 默认红色
+    if (name === "21-40") color = "#FBAE6E";
+    if (name === "41-60") color = "#FFDD7D";
+    if (name === "61-80") color = "#A3E27E";
+    if (name === "81-100") color = "#17C617";
+    return { value, name, itemStyle: { color } };
+  })
+);
+const minPercentage = ref<string>();
+const maxPercentage = ref<string>();
+// 计算最大和最小分段的百分比
+const calcMaxPercentage = () => {
+  maxPercentage.value = (
+    (backendData.value.scoreDistribution[backendData.value.maxSegment] /
+      Object.values(backendData.value.scoreDistribution).reduce(
+        (sum, v) => sum + Number(v),
+        0
+      )) *
+    100
+  ).toFixed(2);
+};
+const calcMinPercentage = () => {
+  minPercentage.value = (
+    (backendData.value.scoreDistribution[backendData.value.minSegment] /
+      Object.values(backendData.value.scoreDistribution).reduce(
+        (sum, v) => sum + Number(v),
+        0
+      )) *
+    100
+  ).toFixed(2);
+};
+// Chart 容器
+const chart = ref<HTMLDivElement | null>(null);
+
+// 加载数据
+const loadData = async () => {
+  if (props.questionId <= 0) return;
+  try {
+    const res = await QuestionControllerService.getQuestionScoreDataUsingGet(
+      props.questionId
+    );
+    backendData.value = res as any; // 根据实际类型调整
+    console.log("backendData.value: " + JSON.stringify(backendData.value));
+    calcMinPercentage();
+    calcMaxPercentage();
+    initChart();
+  } catch (error) {
+    console.error("数据加载失败", error);
+  }
+};
+
+// 初始化图表
+const initChart = () => {
+  if (!chart.value) return;
+  const myChart = echarts.init(chart.value);
+  const option = {
+    tooltip: { trigger: "item", formatter: "{b}: {c} ({d}%)" },
+    series: [
+      {
+        type: "pie",
+        radius: ["0%", "70%"],
+        center: ["50%", "50%"],
+        data: chartData.value,
+        label: { show: false },
+        emphasis: {
+          itemStyle: {
+            shadowBlur: 10,
+            shadowOffsetX: 0,
+            shadowColor: "rgba(0, 0, 0, 0.5)",
+          },
+        },
+      },
+    ],
+  };
+  myChart.setOption(option);
+};
+
+// 初始化和监听 Props
+onMounted(() => {
+  loadData();
+});
+watch(
+  () => props.questionId,
+  (newQuestionId) => {
+    loadData();
+  },
+  { immediate: true }
+);
+
+// 数据解构
+const data = computed(() => backendData.value);
 </script>
 
 <style scoped>
@@ -106,22 +204,22 @@ export default defineComponent({
 }
 
 .summary {
-  width: 45%; /* 左侧占 35% */
-  font-size: 14px; /* 字体大小稍微增大 */
-  font-weight: 500; /* 字体加粗以突出内容 */
-  color: #4a4a4a; /* 使用柔和的深灰色 */
-  line-height: 1.8; /* 增加行间距，改善视觉效果 */
-  padding: 3px; /* 添加内边距，使内容不显得拥挤 */
-  border-right: 1px solid #eaeaea; /* 在右侧添加细线分割 */
+  width: 45%;
+  font-size: 14px;
+  font-weight: 500;
+  color: #4a4a4a;
+  line-height: 1.8;
+  padding: 3px;
+  border-right: 1px solid #eaeaea;
 }
 
 .chart-container {
   width: 50%;
-  height: 200px; /* 高度设置更高以匹配饼图大小 */
+  height: 200px;
   margin: 0;
   display: flex;
   justify-content: center;
-  line-height: 1.8; /* 增加行高，改善间距 */
+  line-height: 1.8;
   align-items: center;
 }
 
@@ -132,17 +230,17 @@ export default defineComponent({
 
 .summary div {
   display: flex;
-  flex-direction: column; /* 每个字段换行 */
-  margin-bottom: 4px; /* 字段之间的间距 */
+  flex-direction: column;
+  margin-bottom: 4px;
 }
 
 .label {
-  font-weight: bold; /* 加粗标签部分 */
-  margin-bottom: 2px; /* 标签与值之间的间距 */
+  font-weight: bold;
+  margin-bottom: 2px;
 }
 
 .value {
-  font-size: 12px; /* 数值部分字体略小 */
-  color: #666; /* 柔和的灰色 */
+  font-size: 12px;
+  color: #666;
 }
 </style>
