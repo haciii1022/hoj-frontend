@@ -109,7 +109,8 @@
           </a-col>
           <a-col flex="auto" class="custom-col">
             <a :href="`/question/list/${form.questionId}`" class="custom-link">
-              {{ form.questionId }}&nbsp;&nbsp;{{ form.questionVO?.title }}
+              <span style="font-weight: 600">P{{ form.questionId }}</span>
+              &nbsp;&nbsp;{{ form.questionVO?.title }}
             </a>
           </a-col>
         </a-row>
@@ -157,7 +158,7 @@
             <div>{{ form.score }}</div>
           </a-col>
         </a-row>
-        <a-row class="custom-row">
+        <a-row class="custom-row" v-if="mainInfo?.time">
           <a-col flex="100px" class="custom-col">
             <div>峰值耗时</div>
           </a-col>
@@ -165,16 +166,16 @@
             <div>{{ mainInfo?.time }} ms</div>
           </a-col>
         </a-row>
-        <a-row class="custom-row">
+        <a-row class="custom-row" v-if="mainInfo?.memory">
           <a-col flex="100px" class="custom-col">
             <div>峰值内存</div>
           </a-col>
           <a-col flex="auto" class="custom-col">
-            <div v-if="mainInfo?.memory != null && mainInfo?.memory < 1024">
+            <div v-if="mainInfo?.memory < 1024">
               <!-- 默认KB为单位-->
               {{ mainInfo?.memory }} KiB
             </div>
-            <div v-else-if="mainInfo?.memory != null">
+            <div v-else>
               <!-- 超过了1024KB才会转化成MB-->
               {{ (mainInfo?.memory / 1024).toFixed(2) }} MiB
             </div>

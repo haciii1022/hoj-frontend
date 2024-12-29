@@ -15,7 +15,12 @@
             allow-clear
           ></a-input>
         </a-form-item>
-        <a-form-item field="tag" label="标签" style="min-width: 240px">
+        <a-form-item
+          field="tag"
+          label="标签"
+          style="min-width: 240px"
+          show-colon
+        >
           <a-input-tag
             v-model="searchParams.tags"
             placeholder="请输入标签"
@@ -122,7 +127,8 @@
         </template>
         <template #problem="{ record }">
           <a @click="doUpdate(record)" class="custom-link">
-            {{ record.id }}&nbsp;&nbsp;{{ record.title }}
+            <span style="font-weight: 600">P{{ record.id }}</span>
+            &nbsp;&nbsp;{{ record.title }}
           </a>
           <span v-if="record.isHidden" style="color: lightgray">(隐藏)</span>
         </template>

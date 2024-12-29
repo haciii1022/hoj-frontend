@@ -1,5 +1,5 @@
 <template>
-  <a-card :bordered="false" class="rounded-card">
+  <a-card :bordered="false" class="rounded-card" v-if="flag">
     <!-- 标题 -->
     <div class="chart-title">统计</div>
     <div class="info-container">
@@ -44,7 +44,7 @@ import {
 } from "vue";
 import * as echarts from "echarts";
 import { QuestionControllerService } from "../../generated";
-
+const flag = ref<boolean>(true);
 // 定义 Props
 interface Props {
   questionId: number;
@@ -131,6 +131,7 @@ const loadData = async () => {
     calcMaxPercentage();
     initChart();
   } catch (error) {
+    flag.value = false;
     console.error("数据加载失败", error);
   }
 };

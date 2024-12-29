@@ -4,7 +4,7 @@
     <a-form
       :model="form"
       style="max-width: 480px; margin: 0 auto"
-      label-align="left"
+      label-align="right"
       ref="formRef"
       auto-label-width
       :rules="passwordRules"
@@ -12,22 +12,38 @@
     >
       <a-form-item
         field="userAccount"
-        label="账号"
-        tooltip="该账号将作为登录凭证"
+        label="用户名"
+        tooltip="该用户名将作为登录凭证,不可重复"
+        show-colon
         :rules="[
-          { required: true, message: '账号不能为空' },
-          { minLength: 4, message: '账号长度不能低于四位' },
+          { required: true, message: '用户名不能为空' },
+          { minLength: 4, message: '用户名长度不能低于四位' },
         ]"
       >
-        <a-input v-model="form.userAccount" placeholder="请输入账号" />
+        <a-input
+          v-model="form.userAccount"
+          placeholder="请输入账号"
+          style="
+            background-color: white;
+            border: 1px solid var(--color-neutral-4);
+          "
+        />
       </a-form-item>
-      <a-form-item field="userName" label="昵称">
-        <a-input v-model="form.userName" placeholder="请输入昵称" />
+      <a-form-item field="userName" label="昵称" show-colon>
+        <a-input
+          v-model="form.userName"
+          placeholder="请输入昵称"
+          style="
+            background-color: white;
+            border: 1px solid var(--color-neutral-4);
+          "
+        />
       </a-form-item>
       <a-form-item
         field="userPassword"
         tooltip="密码不少于8位"
         label="密码"
+        show-colon
         :rules="[
           { required: true, message: '密码不能为空' },
           { minLength: 8, message: '密码长度不能低于八位' },
@@ -36,6 +52,10 @@
         <a-input-password
           v-model="form.userPassword"
           placeholder="请输入密码"
+          style="
+            background-color: white;
+            border: 1px solid var(--color-neutral-4);
+          "
         />
       </a-form-item>
       <!--TODO 在前端表单先验证一次密码是否一致-->
@@ -43,19 +63,32 @@
         field="checkPassword"
         tooltip="密码不少于8位"
         label="确认密码"
+        show-colon
       >
         <a-input-password
           v-model="form.checkPassword"
           placeholder="请再次输入密码"
+          style="
+            background-color: white;
+            border: 1px solid var(--color-neutral-4);
+          "
         />
       </a-form-item>
       <a-form-item>
-        <a-button html-type="submit" type="primary" style="width: 120px"
-          >注册
+        <a-button
+          html-type="submit"
+          type="primary"
+          style="
+            width: 80px;
+            background-color: rgb(var(--arcoblue-4));
+            border-radius: 12px;
+          "
+        >
+          <icon-user-add style="margin-right: 3px" />
+          注册
         </a-button>
       </a-form-item>
     </a-form>
-    {{ form }}
   </div>
 </template>
 
@@ -76,6 +109,14 @@ const form = reactive({
 const formRef = ref();
 const router = useRouter();
 const passwordRules = {
+  userPassword: [
+    {
+      minLength: 8,
+      message: "密码长度必须大于 8 位",
+      trigger: "blur",
+    },
+    { required: true, message: "请输入新密码", trigger: "blur" },
+  ],
   checkPassword: [
     { required: true, message: "请确认新密码", trigger: "blur" },
     {
@@ -89,6 +130,20 @@ const passwordRules = {
     },
   ],
 };
+// const passwordRules = {
+//   checkPassword: [
+//     { required: true, message: "请确认新密码", trigger: "blur" },
+//     {
+//       validator: (value: string, cb: any) => {
+//         if (value !== form.userPassword) {
+//           cb("两次密码输入不一致");
+//         } else {
+//           cb();
+//         }
+//       },
+//     },
+//   ],
+// };
 const handleSubmit = async () => {
   const isValid = await formRef.value.validate();
   if (isValid !== undefined) {
@@ -96,16 +151,41 @@ const handleSubmit = async () => {
   }
   let res = await UserControllerService.userRegisterUsingPost(form);
   if (res.code === 0) {
-    Message.success("注册成功");
-    await store.dispatch("user/getLoginUser");
-    router.push({
-      path: "/user/login",
-      replace: true,
+    Message.success({
+      content: "注册成功",
+      duration: 1000,
     });
+    await store.dispatch("user/getLoginUser");
+    setTimeout(() => {
+      router.push({
+        path: "/user/login",
+        replace: true,
+      });
+    }, 1000); // 延迟 1 秒
   } else {
-    Message.error("注册失败, " + res.message);
+    Message.error({
+      content: "注册失败, " + res.message,
+      duration: 1000,
+    });
   }
 };
 </script>
 
-<style></style>
+<style>
+#userRegisterView {
+  display: flex;
+  flex-direction: column;
+  width: 400px;
+  height: auto;
+  margin: 0 auto;
+  padding: 0 30px 15px 30px;
+  background-color: white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* 阴影 */
+  border-radius: 16px; /* 边框弧度 */
+}
+
+.custom-input {
+  background-color: white;
+  border: 1px solid var(--color-neutral-4);
+}
+</style>

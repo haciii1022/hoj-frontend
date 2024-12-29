@@ -3,25 +3,61 @@
     <h1 style="text-align: left">个人信息</h1>
     <div style="display: flex; flex-direction: row">
       <div class="info-container">
-        <a-form :model="form" label-align="left" auto-label-width>
+        <a-form :model="form" label-align="right" auto-label-width>
           <a-row :gutter="40">
             <a-col :span="14">
-              <a-form-item field="userName" label="用户昵称">
-                <a-input v-model="form.userName" />
+              <a-form-item field="userName" label="用户ID" show-colon required>
+                <a-input
+                  v-model="userId"
+                  disabled
+                  style="
+                    pointer-events: none;
+                    background-color: white;
+                    border: 1px solid var(--color-neutral-4);
+                  "
+                />
               </a-form-item>
             </a-col>
           </a-row>
           <a-row :gutter="40">
             <a-col :span="14">
-              <a-form-item field="userName" label="用户密码" required>
-                <a-input placeholder="**********" disabled />
+              <a-form-item field="userName" label="用户昵称" show-colon>
+                <a-input
+                  v-model="form.userName"
+                  style="
+                    background-color: white;
+                    border: 1px solid var(--color-neutral-4);
+                  "
+                />
+              </a-form-item>
+            </a-col>
+          </a-row>
+          <a-row :gutter="40">
+            <a-col :span="14">
+              <a-form-item
+                field="userName"
+                label="用户密码"
+                required
+                show-colon
+              >
+                <a-input
+                  default-value="**********"
+                  style="
+                    pointer-events: none;
+                    background-color: white;
+                    border: 1px solid var(--color-neutral-4);
+                  "
+                />
               </a-form-item>
             </a-col>
             <a-button
+              class="custom-button"
               status="warning"
-              shape="round"
+              style="background-color: rgb(var(--orange-1))"
               @click="() => (showPasswordModal = true)"
-              >修改密码
+            >
+              <icon-edit style="margin-right: 3px" />
+              修改密码
             </a-button>
           </a-row>
         </a-form>
@@ -32,7 +68,8 @@
           shape="square"
           style="height: 160px; width: 160px"
         >
-          <img alt="暂无头像" :src="form.userAvatar" />
+          <img v-if="form.userAvatar" alt="用户头像" :src="form.userAvatar" />
+          <img v-else alt="暂无头像" src="@/assets/default_square_avatar.svg" />
           <template #trigger-icon>
             <IconEdit />
           </template>
@@ -45,28 +82,35 @@
         />
       </div>
     </div>
-    <div style="text-align: left">
+    <div style="text-align: left; color: #666">
       <a-form :model="form" label-align="left" layout="vertical">
         <a-row :gutter="40">
           <a-col :span="24">
-            <a-form-item field="userName" label="用户简介">
-              <MdEditor
-                :value="form.userProfile"
-                :handle-change="onProfileChange"
-              />
-            </a-form-item>
+            <div style="margin: 0 0 10px 12px">用户简介</div>
+            <MdEditor
+              :value="form.userProfile"
+              :handle-change="onProfileChange"
+            />
           </a-col>
         </a-row>
       </a-form>
       <a-button
+        class="custom-button"
         type="primary"
-        shape="round"
-        style="margin-right: 20px"
+        style="background-color: rgb(var(--arcoblue-3))"
         @click="handleSubmit"
-        >保存
+      >
+        <icon-edit style="margin-right: 3px" />
+        保存
       </a-button>
-      <a-button shape="round" status="success" @click="handleCancel"
-        >取消
+      <a-button
+        class="custom-button"
+        type="primary"
+        @click="handleCancel"
+        style="background-color: var(--color-neutral-6)"
+      >
+        <icon-undo style="margin-right: 3px" />
+        取消
       </a-button>
     </div>
     <a-modal
@@ -76,20 +120,47 @@
       cancel-text="取消"
       @ok="handlePasswordSubmit"
       @cancel="handleCancelPassword"
+      :ok-button-props="{
+        type: 'primary',
+        shape: 'round',
+      }"
     >
+      <template #footer>
+        <a-button
+          type="primary"
+          @click="handleCancelPassword"
+          style="background-color: var(--color-neutral-6); border-radius: 12px"
+        >
+          <icon-undo style="margin-right: 3px" />
+          取消
+        </a-button>
+        <a-button
+          type="primary"
+          style="background-color: rgb(var(--arcoblue-3)); border-radius: 12px"
+          @click="handlePasswordSubmit"
+        >
+          <icon-edit style="margin-right: 3px" />
+          提交
+        </a-button>
+      </template>
       <a-form
         :model="passwordForm"
         label-align="left"
         :rules="passwordRules"
         ref="passwordFormRef"
       >
-        <a-form-item field="newPassword" label="新密码" required>
+        <a-form-item field="newPassword" label="新密码" required show-colon>
           <a-input-password
             v-model="passwordForm.newPassword"
             placeholder="请输入新密码"
           />
         </a-form-item>
-        <a-form-item field="confirmPassword" label="确认密码" required>
+        <a-form-item
+          field="confirmPassword"
+          label="确认密码"
+          required
+          show-colon
+        >
           <a-input-password
             v-model="passwordForm.confirmPassword"
             placeholder="请再次输入新密码"
@@ -109,7 +180,6 @@ import {
 } from "../../../generated";
 import { Message } from "@arco-design/web-vue";
 import { useRouter } from "vue-router";
-import store from "@/store";
 import MdEditor from "@/components/MdEditor.vue";
 
 const fileInput = ref<HTMLInputElement | null>(null);
@@ -120,6 +190,7 @@ const form = ref({
   userAvatar: "",
   userProfile: "",
 } as UserUpdateMyRequest);
+const userId = ref<string>("");
 const showPasswordModal = ref(false); // 控制弹窗的显示与隐藏
 const passwordFormRef = ref();
 const passwordForm = reactive({
@@ -131,6 +202,7 @@ const loadData = async () => {
   const res = await UserControllerService.getUserByRequestUsingGet();
   if (res.code === 0) {
     userInfo.value = res.data;
+    userId.value = res.data?.id as any;
     form.value = { ...userInfo.value };
   } else {
     Message.error("加载失败， " + res.message);
@@ -260,15 +332,17 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   width: 700px;
-  height: 600px;
+  height: auto;
   margin: 0 auto;
-  padding: 30px;
-  background-color: #f4f2f2;
+  padding: 0 30px 15px 30px;
+  background-color: white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* 阴影 */
   border-radius: 16px; /* 边框弧度 */
 }
 
 .info-container {
-  width: 50%;
+  width: 65%;
+  color: #666;
 }
 
 .avatar-container {
@@ -278,5 +352,10 @@ onMounted(() => {
 :deep(.bytemd) {
   height: 250px;
   border-radius: 8px;
+}
+
+.custom-button {
+  border-radius: 12px; /* 边框弧度 */
+  margin-right: 10px;
 }
 </style>

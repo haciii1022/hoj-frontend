@@ -120,8 +120,8 @@
             class="custom-link"
             v-if="record.questionId"
           >
-            {{ record.questionId }}&nbsp;&nbsp;
-            {{ record.questionVO.title }}
+            <span style="font-weight: 600">P{{ record.questionId }}</span>
+            &nbsp;&nbsp;{{ record.questionVO.title }}
           </a>
         </template>
         <template #judgeInfo="{ record }">
