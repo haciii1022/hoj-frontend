@@ -216,7 +216,7 @@ const languageMap: Record<string, string> = {
 };
 
 onMounted(() => {
-  loadData();
+  // loadData();
 });
 const loadData = async () => {
   const res = await QuestionControllerService.listQuestionSubmitByPageUsingPost(

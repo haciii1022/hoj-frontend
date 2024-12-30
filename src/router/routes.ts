@@ -13,6 +13,7 @@ import QuestionSubmitView from "@/views/question/QuestionSubmitListView.vue";
 import AddQuestionView2 from "@/views/question/AddQuestionView2.vue";
 import UserInfoView from "@/views/user/UserInfoView.vue";
 import QuestionSubmitDetailView from "@/views/question/QuestionSubmitDetailView.vue";
+import NoFoundView from "@/views/NoFoundView.vue";
 
 export const routes: Array<RouteRecordRaw> = [
   {
@@ -49,6 +50,9 @@ export const routes: Array<RouteRecordRaw> = [
     path: "/question/list",
     name: "题库",
     component: QuestionListView,
+    meta: {
+      access: ACCESS_ENUM.USER,
+    },
   },
   {
     path: "/question/list/:id",
@@ -98,6 +102,9 @@ export const routes: Array<RouteRecordRaw> = [
     path: "/record/list",
     name: "提交记录",
     component: QuestionSubmitView,
+    meta: {
+      access: ACCESS_ENUM.USER,
+    },
   },
   {
     path: "/record/detail/:id",
@@ -112,6 +119,15 @@ export const routes: Array<RouteRecordRaw> = [
     path: "/noAuth",
     name: "无权限",
     component: NoAuthView,
+    meta: {
+      hideInMenu: true,
+    },
+  },
+  // 捕获所有未匹配的路由
+  {
+    path: "/:pathMatch(.*)*", // 使用通配符
+    name: "notFound",
+    component: NoFoundView, // 可以重定向到自定义404页面
     meta: {
       hideInMenu: true,
     },

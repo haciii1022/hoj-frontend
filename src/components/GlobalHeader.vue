@@ -117,7 +117,13 @@ const doMenuClick = (key: string) => {
 const doLogout = () => {
   UserControllerService.userLogoutUsingPost();
   localStorage.removeItem("loginUser");
-  location.reload();
+  loginUser = JSON.parse(localStorage.getItem("loginUser") as string);
+  setTimeout(() => {
+    window.location.reload();
+  }, 100);
+  router.push({
+    path: "/",
+  });
 };
 
 //用于展示的路由

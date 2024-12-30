@@ -190,7 +190,7 @@ const searchParams = ref<QuestionQueryRequest>({
   current: 1,
 });
 onMounted(() => {
-  loadData();
+  // loadData();
 });
 const loadData = async () => {
   const res = await QuestionControllerService.listQuestionVoByPageUsingPost(

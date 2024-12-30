@@ -59,7 +59,7 @@
 import { reactive } from "vue";
 import { UserControllerService, UserLoginRequest } from "../../../generated";
 import { Message } from "@arco-design/web-vue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import store from "@/store";
 
 const form = reactive({
@@ -68,7 +68,8 @@ const form = reactive({
 } as UserLoginRequest);
 
 const router = useRouter();
-
+const route = useRoute();
+const redirectPath = route.query.redirect || "/";
 const handleSubmit = async () => {
   let res = await UserControllerService.userLoginUsingPost(form);
   if (res.code === 0) {
@@ -77,8 +78,11 @@ const handleSubmit = async () => {
       duration: 1000,
     });
     await store.dispatch("user/getLoginUser");
-    router.push({
-      path: "/",
+    setTimeout(() => {
+      window.location.reload();
+    }, 100);
+    await router.push({
+      path: redirectPath as string,
       replace: true,
     });
   } else {

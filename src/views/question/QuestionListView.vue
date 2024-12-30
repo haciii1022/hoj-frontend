@@ -155,7 +155,7 @@ onMounted(() => {
   if (loginUser && (loginUser.userRole as string) == ACCESS_ENUM.ADMIN) {
     searchParams.value.includeHiddenQuestions = true;
   }
-  loadData();
+  // loadData();
 });
 const loadData = async () => {
   console.log("searchParams.value: " + JSON.stringify(searchParams.value));
