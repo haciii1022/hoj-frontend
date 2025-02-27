@@ -146,7 +146,7 @@
         <template #memory="{ record }">
           <div v-if="record.judgeConfig.memoryLimit != null">
             <!-- 默认KB为单位-->
-            {{ record.judgeConfig.memoryLimit }} KiB
+            {{ Math.ceil(record.judgeConfig.memoryLimit / 1024) }} MiB
           </div>
           <div v-else>-</div>
         </template>

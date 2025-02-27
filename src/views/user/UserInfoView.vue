@@ -85,7 +85,7 @@
     <div style="text-align: left; color: #666">
       <a-form :model="form" label-align="left" layout="vertical">
         <a-row :gutter="40">
-          <a-col :span="24">
+          <a-col :span="24" style="margin-bottom: 10px">
             <div style="margin: 0 0 10px 12px">用户简介</div>
             <MdEditor
               :value="form.userProfile"
