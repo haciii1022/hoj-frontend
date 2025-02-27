@@ -128,7 +128,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { onMounted, ref, watchEffect } from "vue";
+import { onMounted, ref, watch, watchEffect } from "vue";
 import {
   QuestionControllerService,
   QuestionQueryRequest,
@@ -139,6 +139,7 @@ import { useRouter } from "vue-router";
 import moment from "moment";
 import ACCESS_ENUM from "@/access/accessEnum";
 
+const borderColorMap = ref<Record<number, string>>({}); // key: record.id, value: 行对应的状态颜色
 const dataList = ref([] as QuestionVO[]);
 const total = ref(1);
 const router = useRouter();
@@ -176,32 +177,32 @@ const columns = [
     title: "状态", // 新添加的列标题
     slotName: "status",
     width: 150,
-    bodyCellStyle: (record: QuestionVO) => {
-      let borderColor = null;
-      if (record?.historicalScore != -1) {
-        borderColor = record.historicalScore === 100 ? "#17c617" : "red";
-      }
-      return {
-        borderLeft: `2px solid ${borderColor}`,
-      };
-    },
+    bodyCellStyle: (record) => ({
+      borderLeft: `2px solid ${
+        borderColorMap.value[record.id] || "transparent"
+      }`,
+    }),
   },
   {
     title: "题目",
     slotName: "problem",
+    width: 250,
   },
   {
     title: "标签",
     slotName: "tags",
     align: "right",
+    width: 250,
   },
   {
     title: "通过率",
     slotName: "acceptRate",
+    width: 150,
   },
   {
     title: "创建时间",
     slotName: "createTime",
+    width: 150,
   },
   // {
   //   title: "操作",
@@ -252,6 +253,14 @@ const doPageSizeChange = async (pageSize: number) => {
  */
 watchEffect(() => {
   loadData();
+});
+watch(dataList, (newVal) => {
+  borderColorMap.value = newVal.reduce((acc, record) => {
+    if (record.historicalScore != -1 && record.id) {
+      acc[record.id] = record.historicalScore === 100 ? "#17c617" : "red";
+    }
+    return acc;
+  }, {} as Record<string, string>); // 明确类型断言
 });
 </script>
 
