@@ -98,7 +98,7 @@
               :rules="[{ required: true, message: '内存限制不能为空' }]"
             >
               <a-input-number
-                v-model="form.judgeConfig.memoryLimit"
+                v-model="mibMemoryLimit"
                 placeholder="请输入"
                 :min="0"
                 :hide-button="true"
@@ -107,7 +107,7 @@
                   border: 1px solid var(--color-neutral-4);
                 "
               >
-                <template #suffix> KiB</template>
+                <template #suffix> MiB</template>
               </a-input-number>
             </a-form-item>
           </a-col>
@@ -188,14 +188,30 @@
               type="text"
               @click="addJudgeCaseGroup"
               style="padding-right: 10px"
-              >新增数据组
+              >新增
             </a-button>
+            <a-tooltip content="支持上传zip压缩文件，按照文件名依次分组">
+              <a-button
+                type="text"
+                @click="triggerZipInputClick"
+                style="padding: 0"
+              >
+                批量导入
+              </a-button>
+            </a-tooltip>
           </template>
           <input
             type="file"
             accept=".in,.out"
             ref="fileInput"
             @change="handleFileUpload"
+            style="display: none"
+          />
+          <input
+            type="file"
+            accept=".zip"
+            ref="zipInput"
+            @change="handleZipUpload"
             style="display: none"
           />
           <div class="scroll-container">
@@ -342,7 +358,7 @@ const form = ref({
   title: "",
   judgeConfig: {
     timeLimit: 1000,
-    memoryLimit: 1000,
+    memoryLimit: 64 * 1024,
     stackLimit: 0,
   },
   judgeCase: [
@@ -355,9 +371,11 @@ const form = ref({
   acceptedNum: 0,
   submitNum: 0,
 });
+const mibMemoryLimit = ref<number>(64);
 const uploadUser = ref<UserVO>();
 let judgeCaseGroupList = ref([] as JudgeCaseGroupVO[]);
 const fileInput = ref<HTMLInputElement | null>(null);
+const zipInput = ref<HTMLInputElement | null>(null);
 const currentGroupId = ref();
 const router = useRouter();
 const route = useRoute();
@@ -389,7 +407,7 @@ const loadData = async () => {
     if (res1.data?.judgeConfig == null) {
       form.value.judgeConfig = {
         timeLimit: 1000,
-        memoryLimit: 1000,
+        memoryLimit: 64 * 1024,
         stackLimit: 1000,
       };
     } else {
@@ -409,6 +427,7 @@ const loadData = async () => {
     if (res1.data?.tags != null) {
       form.value.tags = JSON.parse(res1.data.tags);
     }
+    mibMemoryLimit.value = form.value.judgeConfig.memoryLimit / 1024;
     // console.log("data " + JSON.stringify(res1.data));
     // console.log("form " + JSON.stringify(form.value));
   } else {
@@ -490,6 +509,20 @@ const onContentChange = (v: string) => {
   form.value.content = v;
 };
 
+const batchImportFile = async () => {
+  const questionId = form.value.id as any;
+  const res = await QuestionControllerService.addJudgeCaseGroupUsingPost({
+    questionId,
+  });
+  if (res.code === 0) {
+    Message.success("新增成功");
+    console.log("add_questionId: " + questionId);
+    await loadJudgeCaseData(questionId);
+  } else {
+    Message.error("新增失败, " + res.message);
+  }
+};
+
 const addJudgeCaseGroup = async () => {
   const questionId = form.value.id as any;
   const res = await QuestionControllerService.addJudgeCaseGroupUsingPost({
@@ -504,6 +537,63 @@ const addJudgeCaseGroup = async () => {
   }
 };
 
+const handleZipUpload = async (event: Event) => {
+  //loading 开启
+  isLoading.value = true;
+
+  const input = event.target as HTMLInputElement;
+  if (!input.files || input.files.length === 0) {
+    Message.warning("请选择文件后再上传！");
+    return;
+  }
+  const file = input.files[0];
+  const fileName = file.name; // 获取文件名
+  // 获取文件后缀
+  const fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1); // 提取文件后缀
+  console.log("文件后缀： " + fileExtension);
+  if (fileExtension !== "zip") {
+    Message.error("仅支持上传zip压缩包");
+    return;
+  }
+  // 限制文件大小不超过 10MB
+  const maxSize = 10 * 1024 * 1024; // 10MB
+  if (file.size > maxSize) {
+    Message.error("压缩包大小不能超过 10MB！");
+    return;
+  }
+  const data = {
+    questionId: form.value.id,
+  };
+  const jsonData = JSON.stringify(data);
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("jsonData", jsonData);
+  if (!file) {
+    console.error("File is not selected!");
+    return;
+  }
+  try {
+    const res = await QuestionControllerService.batchImportFileUsingPost(
+      file,
+      jsonData
+    );
+    if (res.code === 0) {
+      Message.success("上传成功！");
+      // 上传成功后刷新当前数据组列表
+      const questionId = form.value.id;
+      await loadJudgeCaseData(questionId);
+    } else {
+      Message.error(`上传失败: ${res.message}`);
+    }
+  } catch (error) {
+    Message.error("上传失败，请重试！");
+  }
+
+  // 清空文件选择器的值，避免重复上传相同文件时事件不触发
+  input.value = "";
+  //loading 关闭
+  isLoading.value = false;
+};
 const handleFileUpload = async (event: Event) => {
   //loading 开启
   isLoading.value = true;
@@ -517,6 +607,16 @@ const handleFileUpload = async (event: Event) => {
   const fileName = file.name; // 获取文件名
   const fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1); // 提取文件后缀
   console.log("文件后缀： " + fileExtension);
+  if (!(fileExtension === "in" || fileExtension === "out")) {
+    Message.error("仅支持上传.in和.out后缀文件");
+    return;
+  }
+  // 限制文件大小不超过 512KB
+  const maxSize = 512 * 1024; // 512KB
+  if (file.size > maxSize) {
+    Message.error("文件大小不能超过 512KB！");
+    return;
+  }
   // 获取文件后缀
   const type = fileExtension === "in" ? 0 : 1;
   const data = {
@@ -560,13 +660,18 @@ const triggerFileInputClick = (groupId: number) => {
     fileInput.value.click();
   }
 };
-
+const triggerZipInputClick = () => {
+  if (zipInput.value) {
+    zipInput.value.click();
+  }
+};
 const doSubmit = async () => {
   form.value.isHidden = isHidden.value ? 1 : 0;
   const isValid = await formRef.value.validate();
   if (isValid !== undefined) {
     return;
   }
+  form.value.judgeConfig.memoryLimit = mibMemoryLimit.value * 1024;
   if (updatePage) {
     const res = await QuestionControllerService.updateQuestionUsingPost(
       form.value as any
