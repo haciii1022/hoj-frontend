@@ -208,7 +208,7 @@ const columns = [
   {
     title: "题目",
     slotName: "problem",
-    width: 180,
+    width: 250,
     ellipsis: true, // 让内容自动截断
     tooltip: true,
   },
@@ -216,7 +216,7 @@ const columns = [
     title: "标签",
     slotName: "tags",
     key: "tags",
-    width: 300,
+    width: 250,
     ellipsis: true,
     tooltip: true,
   },

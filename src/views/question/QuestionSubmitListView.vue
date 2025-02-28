@@ -249,7 +249,7 @@ const columns = [
   {
     title: "状态",
     slotName: "judgeInfo",
-    width: 250,
+    width: 200,
   },
   {
     title: "用时",
@@ -264,14 +264,14 @@ const columns = [
   {
     title: "题目",
     slotName: "question",
-    width: 150,
+    width: 200,
     ellipsis: true,
     tooltip: true,
   },
   {
     title: "递交者",
     dataIndex: "userVO.userName",
-    width: 150,
+    width: 100,
     ellipsis: true,
     tooltip: true,
   },
