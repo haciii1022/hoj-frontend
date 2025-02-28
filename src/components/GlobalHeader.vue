@@ -67,7 +67,7 @@
             </a-doption>
             <a-doption>
               <template #icon>
-                <icon-user />
+                <icon-unlock />
               </template>
               <template #default>
                 <a-anchor-link @click="doLogout">退出登录</a-anchor-link>

@@ -16,7 +16,15 @@ const checkAccess = (loginUser: any, needAccess = ACCESS_ENUM.NOT_LOGIN) => {
     }
   }
   if (needAccess === ACCESS_ENUM.ADMIN) {
-    if (loginUserAccess !== ACCESS_ENUM.ADMIN) {
+    if (
+      loginUserAccess !== ACCESS_ENUM.ADMIN &&
+      loginUserAccess !== ACCESS_ENUM.ROOT
+    ) {
+      return false;
+    }
+  }
+  if (needAccess === ACCESS_ENUM.ROOT) {
+    if (loginUserAccess !== ACCESS_ENUM.ROOT) {
       return false;
     }
   }

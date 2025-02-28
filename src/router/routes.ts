@@ -14,6 +14,7 @@ import AddQuestionView2 from "@/views/question/AddQuestionView2.vue";
 import UserInfoView from "@/views/user/UserInfoView.vue";
 import QuestionSubmitDetailView from "@/views/question/QuestionSubmitDetailView.vue";
 import NoFoundView from "@/views/NoFoundView.vue";
+import ManageUserView from "@/views/user/ManageUserView.vue";
 
 export const routes: Array<RouteRecordRaw> = [
   {
@@ -104,6 +105,14 @@ export const routes: Array<RouteRecordRaw> = [
     component: QuestionSubmitView,
     meta: {
       access: ACCESS_ENUM.USER,
+    },
+  },
+  {
+    path: "/user/manage",
+    name: "用户管理",
+    component: ManageUserView,
+    meta: {
+      access: ACCESS_ENUM.ROOT,
     },
   },
   {

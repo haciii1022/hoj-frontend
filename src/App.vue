@@ -1,6 +1,8 @@
 <template>
   <div id="app">
-    <template v-if="route.path.startsWith('/user')">
+    <template
+      v-if="route.path.startsWith('/user') && !route.path.includes('/manage')"
+    >
       <router-view />
     </template>
     <template v-else>
@@ -47,9 +49,11 @@ const _ = (window as any).ResizeObserver;
   height: 100vh;
   overflow-x: hidden;
 }
+
 body {
   user-select: none; /* 禁止文字选中 */
 }
+
 .arco-btn-text:hover {
   background-color: transparent !important; /* 禁止悬停背景色 */
 }
